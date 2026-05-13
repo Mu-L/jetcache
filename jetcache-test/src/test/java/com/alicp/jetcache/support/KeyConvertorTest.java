@@ -35,6 +35,11 @@ public class KeyConvertorTest {
         test(JacksonKeyConvertor.INSTANCE);
     }
 
+    @Test
+    public void testJackson3(){
+        test(Jackson3KeyConvertor.INSTANCE);
+    }
+
     private void test(Function<Object, Object> g) {
         Object k1, k2, k3;
 

@@ -19,6 +19,8 @@ public interface KeyConvertor extends Function<Object, Object> {
      */
     String JACKSON = "JACKSON";
 
+    String JACKSON3 = "JACKSON3";
+
     /**
      * @since 2.7
      */

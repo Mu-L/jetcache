@@ -7,6 +7,7 @@ import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.anno.KeyConvertor;
 import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Jackson3KeyConvertor;
 import com.alicp.jetcache.support.JacksonKeyConvertor;
 
 import java.util.function.Function;
@@ -26,6 +27,8 @@ public class DefaultKeyConvertorParser implements KeyConvertorParser {
             return Fastjson2KeyConvertor.INSTANCE;
         } else if (KeyConvertor.JACKSON.equalsIgnoreCase(convertor)) {
             return JacksonKeyConvertor.INSTANCE;
+        }else if (KeyConvertor.JACKSON3.equalsIgnoreCase(convertor)) {
+            return Jackson3KeyConvertor.INSTANCE;
         } else if (KeyConvertor.NONE.equalsIgnoreCase(convertor)) {
             return KeyConvertor.NONE_INSTANCE;
         }
