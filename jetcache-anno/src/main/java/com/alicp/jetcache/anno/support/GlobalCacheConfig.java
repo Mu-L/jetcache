@@ -26,6 +26,7 @@ public class GlobalCacheConfig {
     private boolean areaInCacheName = false;
     private boolean penetrationProtect = false;
     private boolean enableMethodCache = true;
+    private boolean useDefaultLocalExpireInMultiLevelCache = false;
 
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
@@ -105,5 +106,13 @@ public class GlobalCacheConfig {
 
     public void setEnableMethodCache(boolean enableMethodCache) {
         this.enableMethodCache = enableMethodCache;
+    }
+
+    public boolean isUseDefaultLocalExpireInMultiLevelCache() {
+        return useDefaultLocalExpireInMultiLevelCache;
+    }
+
+    public void setUseDefaultLocalExpireInMultiLevelCache(boolean useDefaultLocalExpireInMultiLevelCache) {
+        this.useDefaultLocalExpireInMultiLevelCache = useDefaultLocalExpireInMultiLevelCache;
     }
 }

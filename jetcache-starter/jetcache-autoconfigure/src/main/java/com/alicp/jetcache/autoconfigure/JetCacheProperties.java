@@ -15,6 +15,7 @@ public class JetCacheProperties {
     private boolean areaInCacheName = true;
     private boolean penetrationProtect = false;
     private boolean enableMethodCache = true;
+    private boolean useDefaultLocalExpireInMultiLevelCache = false;
 
     public JetCacheProperties(){
     }
@@ -64,5 +65,13 @@ public class JetCacheProperties {
 
     public void setEnableMethodCache(boolean enableMethodCache) {
         this.enableMethodCache = enableMethodCache;
+    }
+
+    public boolean isUseDefaultLocalExpireInMultiLevelCache() {
+        return useDefaultLocalExpireInMultiLevelCache;
+    }
+
+    public void setUseDefaultLocalExpireInMultiLevelCache(boolean useDefaultLocalExpireInMultiLevelCache) {
+        this.useDefaultLocalExpireInMultiLevelCache = useDefaultLocalExpireInMultiLevelCache;
     }
 }

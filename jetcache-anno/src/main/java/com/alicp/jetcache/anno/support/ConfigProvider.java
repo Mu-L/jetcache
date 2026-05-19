@@ -44,6 +44,7 @@ public class ConfigProvider extends AbstractLifecycle {
     @Override
     protected void doInit() {
         cacheBuilderTemplate = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
+                globalCacheConfig.isUseDefaultLocalExpireInMultiLevelCache(),
                 globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
         for (CacheBuilder builder : globalCacheConfig.getLocalCacheBuilders().values()) {
             EmbeddedCacheBuilder eb = (EmbeddedCacheBuilder) builder;
