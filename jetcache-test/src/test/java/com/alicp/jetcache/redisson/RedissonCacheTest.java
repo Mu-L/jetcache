@@ -8,7 +8,7 @@ import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;

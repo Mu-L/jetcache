@@ -8,7 +8,7 @@ import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.external.MockRemoteCacheBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author huangli

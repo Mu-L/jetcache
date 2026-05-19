@@ -9,8 +9,8 @@ import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -47,7 +47,7 @@ public class MockStarterTest extends SpringTest {
 
         @PostConstruct
         public void test() {
-            Assert.assertTrue(cache.PUT("K", "V").isSuccess());
+            Assertions.assertTrue(cache.PUT("K", "V").isSuccess());
         }
     }
 
