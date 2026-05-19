@@ -63,7 +63,6 @@ public class RedisLettuceAutoConfiguration {
             String readFromStr = ct.getProperty("readFrom");
             String mode = ct.getProperty("mode");
             long asyncResultTimeoutInMillis = ct.getProperty("asyncResultTimeoutInMillis", CacheConsts.ASYNC_RESULT_TIMEOUT.toMillis());
-            boolean enablePubSub = parseBroadcastChannel(ct) != null;
             ReadFrom readFrom = null;
             if (readFromStr != null) {
                 readFrom = ReadFrom.valueOf(readFromStr.trim());
@@ -71,7 +70,7 @@ public class RedisLettuceAutoConfiguration {
 
             AbstractRedisClient client;
             StatefulConnection<byte[], byte[]> connection;
-            StatefulRedisPubSubConnection<byte[], byte[]> pubSubConnection = null;
+            StatefulRedisPubSubConnection<byte[], byte[]> pubSubConnection;
             if (map == null || map.size() == 0) {
                 throw new CacheConfigException("lettuce uri is required");
             } else {
@@ -79,24 +78,13 @@ public class RedisLettuceAutoConfiguration {
                         .collect(Collectors.toList());
 
                 if ("Cluster".equalsIgnoreCase(mode)) {
-                    client = RedisClusterClient.create(uriList);
+                    client = createRedisClusterClient(uriList);
                     connection = clusterConnection(ct, readFrom, (RedisClusterClient) client, false);
-                    if (enablePubSub) {
-                        pubSubConnection = (StatefulRedisPubSubConnection) clusterConnection(ct, readFrom, (RedisClusterClient) client, true);
-                    }
+                    pubSubConnection = (StatefulRedisPubSubConnection) clusterConnection(ct, readFrom, (RedisClusterClient) client, true);
                 } else {
-                    client = RedisClient.create();
-                    ((RedisClient) client).setOptions(ClientOptions.builder().
-                            disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                    StatefulRedisMasterReplicaConnection c = MasterReplica.connect(
-                            (RedisClient) client, new JetCacheCodec(), uriList);
-                    if (readFrom != null) {
-                        c.setReadFrom(readFrom);
-                    }
-                    connection = c;
-                    if (enablePubSub) {
-                        pubSubConnection = ((RedisClient) client).connectPubSub(new JetCacheCodec(), uriList.get(0));
-                    }
+                    client = createRedisClient();
+                    connection = connect((RedisClient) client, uriList, readFrom);
+                    pubSubConnection = connectPubSub((RedisClient) client, uriList.get(0));
                 }
             }
 
@@ -110,12 +98,38 @@ public class RedisLettuceAutoConfiguration {
             // eg: "remote.default.client"
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".client", client);
             LettuceConnectionManager m = LettuceConnectionManager.defaultManager();
-            m.init(client, connection);
+            m.init(client, connection, pubSubConnection);
+            autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".pubSubConnection", m.pubSubConnection(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".connection", m.connection(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".commands", m.commands(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".asyncCommands", m.asyncCommands(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".reactiveCommands", m.reactiveCommands(client));
             return externalCacheBuilder;
+        }
+
+        protected RedisClusterClient createRedisClusterClient(List<RedisURI> uriList) {
+            return RedisClusterClient.create(uriList);
+        }
+
+        protected RedisClient createRedisClient() {
+            RedisClient client = RedisClient.create();
+            client.setOptions(ClientOptions.builder()
+                    .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
+                    .build());
+            return client;
+        }
+
+        protected StatefulConnection<byte[], byte[]> connect(RedisClient client, List<RedisURI> uriList, ReadFrom readFrom) {
+            StatefulRedisMasterReplicaConnection<byte[], byte[]> c = MasterReplica.connect(
+                    client, new JetCacheCodec(), uriList);
+            if (readFrom != null) {
+                c.setReadFrom(readFrom);
+            }
+            return c;
+        }
+
+        protected StatefulRedisPubSubConnection<byte[], byte[]> connectPubSub(RedisClient client, RedisURI redisURI) {
+            return client.connectPubSub(new JetCacheCodec(), redisURI);
         }
 
         private StatefulConnection<byte[], byte[]> clusterConnection(ConfigTree ct, ReadFrom readFrom, RedisClusterClient client, boolean pubsub) {
