@@ -10,7 +10,7 @@ import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -31,7 +31,7 @@ public class LettuceConnectionManager {
 
     private static final LettuceConnectionManager defaultManager = new LettuceConnectionManager();
 
-    private final Map<AbstractRedisClient, LettuceObjects> map = new HashMap<>();
+    private final Map<AbstractRedisClient, LettuceObjects> map = Collections.synchronizedMap(new WeakHashMap());
 
     private LettuceConnectionManager() {
     }
@@ -49,30 +49,36 @@ public class LettuceConnectionManager {
     }
 
     /**
-     * @deprecated use {@link #init(AbstractRedisClient, StatefulConnection, StatefulRedisPubSubConnection)} instead
+     * @deprecated use init with {@link #init(AbstractRedisClient, StatefulConnection, StatefulRedisPubSubConnection)}
+     * @param redisClient
+     * @param connection
      */
     @Deprecated
-    public synchronized void init(AbstractRedisClient redisClient, StatefulConnection connection) {
-        init(redisClient, connection, null);
+    public void init(AbstractRedisClient redisClient, StatefulConnection connection) {
+        LettuceObjects lo = map.computeIfAbsent(redisClient, key -> new LettuceObjects());
+        lo.connection = connection;
     }
 
     /**
-     * Initialize with existing connections. Only sets fields that are not already set.
-     * @param redisClient the redis client
-     * @param connection the normal connection, can be null
-     * @param pubSubConnection the pub/sub connection, can be null
+     * Initialize with existing connections
+     * @param redisClient
+     * @param connection
+     * @param pubSubConnection allow null
      */
-    public synchronized void init(AbstractRedisClient redisClient, StatefulConnection connection, StatefulRedisPubSubConnection pubSubConnection) {
+    public void init(AbstractRedisClient redisClient, StatefulConnection connection, StatefulRedisPubSubConnection pubSubConnection) {
+        if (connection == null && pubSubConnection == null) {
+            throw new IllegalArgumentException("connection and pubSubConnection cannot both be null");
+        }
         LettuceObjects lo = map.computeIfAbsent(redisClient, key -> new LettuceObjects());
-        if (connection != null && lo.connection == null) {
+        if (connection != null) {
             lo.connection = connection;
         }
-        if (pubSubConnection != null && lo.pubSubConnection == null) {
+        if (pubSubConnection != null) {
             lo.pubSubConnection = pubSubConnection;
         }
     }
 
-    public synchronized StatefulConnection connection(AbstractRedisClient redisClient) {
+    public StatefulConnection connection(AbstractRedisClient redisClient) {
         LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
         if (lo.connection == null) {
             if (redisClient instanceof RedisClient) {
@@ -86,7 +92,7 @@ public class LettuceConnectionManager {
         return lo.connection;
     }
 
-    public synchronized StatefulRedisPubSubConnection pubSubConnection(AbstractRedisClient redisClient) {
+    public StatefulRedisPubSubConnection pubSubConnection(AbstractRedisClient redisClient) {
         LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
         if (lo.pubSubConnection == null) {
             if (redisClient instanceof RedisClient) {
@@ -100,7 +106,8 @@ public class LettuceConnectionManager {
         return lo.pubSubConnection;
     }
 
-    public synchronized Object commands(AbstractRedisClient redisClient) {
+
+    public Object commands(AbstractRedisClient redisClient) {
         connection(redisClient);
         LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
         if (lo.commands == null) {
@@ -115,7 +122,8 @@ public class LettuceConnectionManager {
         return lo.commands;
     }
 
-    public synchronized Object asyncCommands(AbstractRedisClient redisClient) {
+
+    public Object asyncCommands(AbstractRedisClient redisClient) {
         connection(redisClient);
         LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
         if (lo.asyncCommands == null) {
@@ -130,7 +138,7 @@ public class LettuceConnectionManager {
         return lo.asyncCommands;
     }
 
-    public synchronized Object reactiveCommands(AbstractRedisClient redisClient) {
+    public Object reactiveCommands(AbstractRedisClient redisClient) {
         connection(redisClient);
         LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
         if (lo.reactiveCommands == null) {
@@ -145,8 +153,8 @@ public class LettuceConnectionManager {
         return lo.reactiveCommands;
     }
 
-    public synchronized void removeAndClose(AbstractRedisClient redisClient) {
-        LettuceObjects lo = map.remove(redisClient);
+    public void removeAndClose(AbstractRedisClient redisClient) {
+        LettuceObjects lo = (LettuceObjects) map.remove(redisClient);
         if (lo == null) {
             return;
         }
@@ -164,7 +172,7 @@ public class LettuceConnectionManager {
         if (lo.connection != null) {
             lo.connection.close();
         }
-        if (lo.pubSubConnection != null) {
+        if (lo.pubSubConnection != null){
             lo.pubSubConnection.close();
         }
         redisClient.shutdown();

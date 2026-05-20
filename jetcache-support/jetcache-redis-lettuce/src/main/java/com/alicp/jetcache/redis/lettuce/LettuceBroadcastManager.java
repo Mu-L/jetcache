@@ -99,9 +99,7 @@ public class LettuceBroadcastManager extends BroadcastManager {
 
     @Override
     public void close() {
-        if (pubSubAdapter != null) {
-            config.getPubSubConnection().removeListener(pubSubAdapter);
-        }
+        config.getPubSubConnection().removeListener(this.pubSubAdapter);
         config.getPubSubConnection().close();
     }
 }
