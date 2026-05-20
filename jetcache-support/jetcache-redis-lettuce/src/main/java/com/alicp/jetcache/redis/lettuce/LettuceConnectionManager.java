@@ -31,7 +31,7 @@ public class LettuceConnectionManager {
 
     private static final LettuceConnectionManager defaultManager = new LettuceConnectionManager();
 
-    private final Map<AbstractRedisClient, LettuceObjects> map = new HashMap<>();
+    private final Map<AbstractRedisClient, LettuceObjects> map = new WeakHashMap<>();
 
     private LettuceConnectionManager() {
     }
