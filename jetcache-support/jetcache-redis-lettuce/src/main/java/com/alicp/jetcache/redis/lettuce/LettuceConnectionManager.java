@@ -8,7 +8,6 @@ import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
 import java.util.Collections;
 import java.util.Map;
@@ -23,7 +22,6 @@ public class LettuceConnectionManager {
 
     private static class LettuceObjects {
         private StatefulConnection connection;
-        private StatefulRedisPubSubConnection pubSubConnection;
         private Object commands;
         private Object asyncCommands;
         private Object reactiveCommands;
@@ -48,34 +46,12 @@ public class LettuceConnectionManager {
         return lo;
     }
 
-    /**
-     * @deprecated use init with {@link #init(AbstractRedisClient, StatefulConnection, StatefulRedisPubSubConnection)}
-     * @param redisClient
-     * @param connection
-     */
-    @Deprecated
     public void init(AbstractRedisClient redisClient, StatefulConnection connection) {
-        LettuceObjects lo = map.computeIfAbsent(redisClient, key -> new LettuceObjects());
-        lo.connection = connection;
-    }
-
-    /**
-     * Initialize with existing connections
-     * @param redisClient
-     * @param connection
-     * @param pubSubConnection allow null
-     */
-    public void init(AbstractRedisClient redisClient, StatefulConnection connection, StatefulRedisPubSubConnection pubSubConnection) {
-        if (connection == null && pubSubConnection == null) {
-            throw new IllegalArgumentException("connection and pubSubConnection cannot both be null");
-        }
-        LettuceObjects lo = map.computeIfAbsent(redisClient, key -> new LettuceObjects());
-        if (connection != null) {
+        map.computeIfAbsent(redisClient, key -> {
+            LettuceObjects lo = new LettuceObjects();
             lo.connection = connection;
-        }
-        if (pubSubConnection != null) {
-            lo.pubSubConnection = pubSubConnection;
-        }
+            return lo;
+        });
     }
 
     public StatefulConnection connection(AbstractRedisClient redisClient) {
@@ -91,21 +67,6 @@ public class LettuceConnectionManager {
         }
         return lo.connection;
     }
-
-    public StatefulRedisPubSubConnection pubSubConnection(AbstractRedisClient redisClient) {
-        LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
-        if (lo.pubSubConnection == null) {
-            if (redisClient instanceof RedisClient) {
-                lo.pubSubConnection = ((RedisClient) redisClient).connectPubSub(new JetCacheCodec());
-            } else if (redisClient instanceof RedisClusterClient) {
-                lo.pubSubConnection = ((RedisClusterClient) redisClient).connectPubSub(new JetCacheCodec());
-            } else {
-                throw new CacheConfigException("type " + redisClient.getClass() + " is not supported");
-            }
-        }
-        return lo.pubSubConnection;
-    }
-
 
     public Object commands(AbstractRedisClient redisClient) {
         connection(redisClient);
@@ -171,9 +132,6 @@ public class LettuceConnectionManager {
         */
         if (lo.connection != null) {
             lo.connection.close();
-        }
-        if (lo.pubSubConnection != null){
-            lo.pubSubConnection.close();
         }
         redisClient.shutdown();
     }

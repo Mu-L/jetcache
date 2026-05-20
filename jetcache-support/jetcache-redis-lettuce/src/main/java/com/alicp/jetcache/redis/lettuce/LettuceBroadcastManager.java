@@ -50,7 +50,7 @@ public class LettuceBroadcastManager extends BroadcastManager {
         this.config = config;
         this.channel = config.getBroadcastChannel().getBytes(StandardCharsets.UTF_8);
         this.lettuceConnectionManager = config.getConnectionManager();
-        this.lettuceConnectionManager.init(config.getRedisClient(), config.getConnection(), config.getPubSubConnection());
+        this.lettuceConnectionManager.init(config.getRedisClient(), config.getConnection());
         this.stringAsyncCommands = (BaseRedisAsyncCommands<byte[], byte[]>) lettuceConnectionManager
                 .asyncCommands(config.getRedisClient());
     }
