@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>jetcache-parent</artifactId>
+    <name>jetcache-parent</name>
     <packaging>pom</packaging>
 
     <properties>

@@ -9,5 +9,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>jetcache-anno-api</artifactId>
+    <name>jetcache-anno-api</name>
 
 </project>

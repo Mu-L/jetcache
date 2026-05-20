@@ -9,6 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>jetcache-starter-redis-lettuce</artifactId>
+    <name>jetcache-starter-redis-lettuce</name>
 
     <dependencies>
         <dependency>
