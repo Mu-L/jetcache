@@ -47,7 +47,7 @@ public class JavaEncoderTest extends AbstractEncoderTest {
         byte[] bytes = encoder.apply("12345");
         bytes[0] = 0;
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
-        writeHeader(bytes, SerialPolicy.IDENTITY_NUMBER_KRYO4);
+        writeHeader(bytes, SerialPolicy.IDENTITY_NUMBER_KRYO5);
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
 
         encoder = JavaValueEncoder.INSTANCE;

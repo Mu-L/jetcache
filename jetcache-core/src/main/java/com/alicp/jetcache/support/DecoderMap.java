@@ -56,8 +56,13 @@ public class DecoderMap {
                 return;
             }
             register(SerialPolicy.IDENTITY_NUMBER_JAVA, defaultJavaValueDecoder());
-            register(SerialPolicy.IDENTITY_NUMBER_KRYO4, KryoValueDecoder.INSTANCE);
-            register(SerialPolicy.IDENTITY_NUMBER_KRYO5, Kryo5ValueDecoder.INSTANCE);
+            try {
+                Class.forName("com.esotericsoftware.kryo.kryo5.Kryo");
+                register(SerialPolicy.IDENTITY_NUMBER_KRYO5, Kryo5ValueDecoder.INSTANCE);
+            } catch (ClassNotFoundException e) {
+                // the com.esotericsoftware:kryo should be 5+
+                register(SerialPolicy.IDENTITY_NUMBER_KRYO5, KryoValueDecoder.INSTANCE);
+            }
             // register(SerialPolicy.IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
             inited = true;
         } finally {

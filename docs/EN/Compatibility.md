@@ -9,6 +9,10 @@ jetcache tested with below spring/spring-boot versions
 | 2.7.4      | 5.2.4.RELEASE~6.2.18        | 2.2.5.RELEASE~3.5.14        | |
 
 # compatible change notes
+## 2.8.0
+* kryo4 is no longer supported, `com.esotericsoftware:kryo` is upgraded to 5.x. kryo4 serialized data is not compatible with kryo5, wait for old cache entries to expire or clear cache before upgrading
+* Removed `IDENTITY_NUMBER_KRYO4` constant
+
 ## 2.7.4
 * use spring-boot 3.1.3, spring-framework 6.0.11, slf4j-api 2.x as default
 * remove javax.annotation:javax.annotation-api, if you use @PostConstruct, you may need to add this dependency by yourself
@@ -18,10 +22,7 @@ jetcache tested with below spring/spring-boot versions
 
 ## 2.7.0
 * jetcache-redis depends on jedis4，springdata(jedis) depends on jedis3, can't use together
-* encoder/decoder now support kryo4 and kryo5, in yml "kryo" is kryo4，"kryo5" is kryo5. the kryo4 and kryo5 is not compatible.
-    * in maven kryo4 is com.esotericsoftware:kryo, kryo5 is com.esotericsoftware.kryo:kryo5
-    * kryo4 and kryo5 can be used together
-    * notice that version of com.esotericsoftware:kryo can be set to 5.x.x
+* encoder/decoder now support kryo5. In yml "kryo" maps to `com.esotericsoftware:kryo` (5.x), "kryo5" maps to `com.esotericsoftware.kryo:kryo5`. Both use kryo5 serialization format and are wire-compatible, but have different maven coordinates and Java package names, so they can coexist
 * use lettuce to connect redis cluster need specify "mode=cluster" in yml
 * default key convertor change to "fastjson2", fastjson2 and fastjson can be used together, fastjson(not fastjson2)/kryo/kryo5/mvel is now optional in maven
 * if not use spring boot, add ```@Import(JetCacheBaseBeans.class)```, and remove old configProvider bean definition. see docs for detail example.

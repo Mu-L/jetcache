@@ -93,7 +93,7 @@ mvn verify               # also runs PMD check (Alibaba p3c ruleset)
 - Spring/Spring Boot version support varies by jetcache version; current (2.7.4+) supports Spring 5.2.4~6.1.15, Spring Boot 2.2.5~3.2.12
 - `jetcache-redis` (Jedis) and `spring-data-redis` (Jedis) use different jedis major versions and **cannot coexist** on classpath
 - Default key convertor changed from `fastjson` to `fastjson2` in 2.7; both can coexist
-- `kryo` (v4) and `kryo5` are separate artifacts (`com.esotericsoftware:kryo` vs `com.esotericsoftware.kryo:kryo5`), not wire-compatible
+- Since 2.8.0, kryo4 is dropped; `com.esotericsoftware:kryo` is now 5.x, and `kryo5` (`com.esotericsoftware.kryo:kryo5`) can coexist — both use kryo5 format (wire-compatible) but different Java package names; old kryo4 data is not readable
 - `areaInCacheName` default changed to `false` in 2.7 (was `true` in 2.6 and earlier)
 - JSON serializers (fastjson2/jackson) are **not registered by default** due to type-safety concerns with `Object` fields
 - `@Cached` uses Spring AOP (proxy-based); self-invocation within the same class bypasses the cache

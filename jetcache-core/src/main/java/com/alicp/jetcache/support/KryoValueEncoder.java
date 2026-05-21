@@ -10,6 +10,8 @@ import java.util.Arrays;
 /**
  * Created on 2016/10/4.
  *
+ * Since 2.8.0 the com.esotericsoftware:kryo should be 5+, kryo4 is not supported.
+ *
  * @author huangli
  */
 public class KryoValueEncoder extends AbstractValueEncoder {
@@ -28,7 +30,7 @@ public class KryoValueEncoder extends AbstractValueEncoder {
         @Override
         public void reset(KryoCache obj) {
             obj.getKryo().reset();
-            obj.getOutput().clear();
+            obj.getOutput().reset();
         }
     });
 
@@ -38,8 +40,8 @@ public class KryoValueEncoder extends AbstractValueEncoder {
         public KryoCache(){
             kryo = new Kryo();
             kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
-            byte[] buffer = new byte[INIT_BUFFER_SIZE];
-            output = new Output(buffer, -1);
+            kryo.setRegistrationRequired(false);
+            output = new Output(INIT_BUFFER_SIZE, -1);
         }
 
         public Output getOutput(){
@@ -59,14 +61,12 @@ public class KryoValueEncoder extends AbstractValueEncoder {
         KryoCache kryoCache = null;
         try {
             kryoCache = kryoCacheObjectPool.borrowObject();
-//            Output output = new Output(kryoCache.getBuffer(), -1);
-//            output.clear();
             Output output = kryoCache.getOutput();
             if (useIdentityNumber) {
-                writeInt(output, SerialPolicy.IDENTITY_NUMBER_KRYO4);
+                writeInt(output, SerialPolicy.IDENTITY_NUMBER_KRYO5);
             }
             kryoCache.getKryo().writeClassAndObject(output, value);
-            return output.toBytes();
+            return kryoCache.getOutput().toBytes();
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder("Kryo Encode error. ");
             sb.append("msg=").append(e.getMessage());

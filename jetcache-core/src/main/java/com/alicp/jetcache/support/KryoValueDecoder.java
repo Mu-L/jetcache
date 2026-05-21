@@ -8,6 +8,8 @@ import java.io.ByteArrayInputStream;
 /**
  * Created on 2016/10/4.
  *
+ * Since 2.8.0 the com.esotericsoftware:kryo should be 5+, kryo4 is not supported.
+ *
  * @author huangli
  */
 public class KryoValueDecoder extends AbstractValueDecoder {
