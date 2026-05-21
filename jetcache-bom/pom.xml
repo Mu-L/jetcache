@@ -41,19 +41,19 @@
         <maven-help-plugin.version>3.2.0</maven-help-plugin.version>
         <xml-maven-plugin.version>1.0.2</xml-maven-plugin.version>
 
-        <spring.framework.version>6.2.18</spring.framework.version>
-        <spring.boot.version>3.5.14</spring.boot.version>
-        <spring.data.redis.version>3.5.11</spring.data.redis.version>
-        <lettuce.version>6.6.0.RELEASE</lettuce.version>
+        <spring.framework.version>7.0.7</spring.framework.version>
+        <spring.boot.version>4.0.6</spring.boot.version>
+        <spring.data.redis.version>4.0.5</spring.data.redis.version>
+        <lettuce.version>6.8.2.RELEASE</lettuce.version>
 
-        <jedis.version>6.0.0</jedis.version>
-        <redisson.version>3.18.0</redisson.version>
+        <jedis.version>7.0.0</jedis.version>
+        <redisson.version>4.4.0</redisson.version>
 
         <jackson.version>2.21.2</jackson.version>
         <jackson3.version>3.1.2</jackson3.version>
-        <junit.version>5.9.3</junit.version>
-        <slf4j.version>2.0.18</slf4j.version>
-        <logback.version>1.5.25</logback.version>
+        <junit.version>6.0.3</junit.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <logback.version>1.5.32</logback.version>
     </properties>
 
     <dependencyManagement>
@@ -227,8 +227,7 @@
             <dependency>
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
-                <version>2.9.3</version>
-                <!--3.0+ need java 11-->
+                <version>3.2.3</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
