@@ -9,7 +9,7 @@ jetcache:
     default:
       type: caffeine
       limit: 100
-      keyConvertor: fastjson2 #other choose：fastjson/jackson
+      keyConvertor: fastjson2 #other choose：fastjson(same as fastjson2)/jackson/jackson3
       expireAfterWriteInMillis: 100000
     otherArea:
       type: linkedhashmap
@@ -19,7 +19,7 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2 #other choose：fastjson/jackson
+      keyConvertor: fastjson2 #other choose：fastjson(same as fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       valueEncoder: java #other choose：kryo/kryo5
       valueDecoder: java #other choose：kryo/kryo5
@@ -31,7 +31,7 @@ jetcache:
       port: ${redis.port}
     otherArea:
       type: redis
-      keyConvertor: fastjson2 #other choose：fastjson/jackson
+      keyConvertor: fastjson2 #other choose：fastjson(same as fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       valueEncoder: java #other choose：kryo/kryo5
       valueDecoder: java #other choose：kryo/kryo5
@@ -53,9 +53,9 @@ The description of configuration listed in the below table:
 | jetcache.useDefaultLocalExpireInMultiLevelCache | false | If set to true, when cacheType is BOTH and localExpire is not explicitly set (including `@Cached`, `@CreateCache` annotations and `QuickConfig` API), the local cache expire time will be the minimum of the local cache builder's `expireAfterWriteInMillis` and `expire`. |
 | jetcache.hiddenPackages | undefined | The package name startsWith(hiddenPackages) will be cut off in the generated cache instance name.                                                                                                                                                                                                                                                    |
 | jetcache.[local/remote].${area}.type | undefined | Type of the backend cache system. Can be ```tair```, ```redis``` for remote cache ,or ```linkedhashmap```, ```caffeine``` for local cache.                                                                                                                                                                                                           |
-| jetcache.[local/remote].${area}.keyConvertor | fastjson2 | Global config of key convertor. 2.6.5+ support key convertor: ```fastjson2```/```jackson```;</br>2.6.5- only build-in key convertor: ```fastjson```. You can use ```none``` only in the case of ```@CreateCache(cacheType=CacheType.LOCAL)```, in this situation ```equals``` is used to distinguish key. Method caching must specify a keyConvertor |
-| jetcache.[local/remote].${area}.valueEncoder | java | Global config of value encoder, only remote cache need it. 2.7+ support valueEncoder: ```java```/```kryo```/```kryo5```；2.6- build-in valueEncoder: ```java```/```kryo```                                                                                                                                                                            |
-| jetcache.[local/remote].${area}.valueDecoder | java | Global config of value decoder, only remote cache need it. 2.7+ support valueEncoder: ```java```/```kryo```/```kryo5```；2.6- build-in valueEncoder: ```java```/```kryo```                                                                                                                                                                            |
+| jetcache.[local/remote].${area}.keyConvertor | fastjson2 | Global config of key convertor. 2.8+ supports key convertor: ```fastjson2```/```jackson```/```jackson3``` (```fastjson``` is also available, which uses fastjson2 internally). You can use ```none``` only in the case of ```@CreateCache(cacheType=CacheType.LOCAL)```, in this situation ```equals``` is used to distinguish key. Method caching must specify a keyConvertor |
+| jetcache.[local/remote].${area}.valueEncoder | java | Global config of value encoder, only remote cache need it. 2.8+ supports valueEncoder: ```java```/```kryo```/```kryo5``` (```kryo``` and ```kryo5``` both use kryo5 implementation) |
+| jetcache.[local/remote].${area}.valueDecoder | java | Global config of value decoder, only remote cache need it. 2.8+ supports valueDecoder: ```java```/```kryo```/```kryo5``` (```kryo``` and ```kryo5``` both use kryo5 implementation) |
 | jetcache.[local/remote].${area}.limit | 100 | Global config of max elements in local memory for *each* ```Cache``` instance. Only local cache need it.                                                                                                                                                                                                                                             |
 | jetcache.[local/remote].${area}.expireAfterWriteInMillis | infinity | Global config of write expire time, in millis.                                                                                                                                                                                                                                                                                                       |
 | jetcache.remote.${area}.broadcastChannel | n/a | jetcahe2.7 support invalidate local cache of other jvm after updatation (cacheType = CacheType.BOTH), this config specify broadcast channel, this feature disabled if not set                                                                                                                                                                        |

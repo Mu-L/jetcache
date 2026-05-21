@@ -41,7 +41,7 @@ private Cache<Long, UserDO> userCache;
 |cacheType|CacheType.REMOTE|缓存的类型，包括CacheType.REMOTE、CacheType.LOCAL、CacheType.BOTH。如果定义为BOTH，会使用LOCAL和REMOTE组合成两级缓存|
 |localLimit|未定义|如果cacheType为CacheType.LOCAL或CacheType.BOTH，这个参数指定本地缓存的最大元素数量，以控制内存占用。注解上没有定义的时候会使用全局配置，如果此时全局配置也没有定义，则取100|
 |serialPolicy|未定义|如果cacheType为CacheType.REMOTE或CacheType.BOTH，指定远程缓存的序列化方式。JetCache内置的可选值为SerialPolicy.JAVA和SerialPolicy.KRYO。注解上没有定义的时候会使用全局配置，如果此时全局配置也没有定义，则取SerialPolicy.JAVA|
-|keyConvertor|未定义|指定KEY的转换方式，用于将复杂的KEY类型转换为缓存实现可以接受的类型，JetCache内置的可选值为KeyConvertor.FASTJSON和KeyConvertor.NONE。NONE表示不转换，FASTJSON通过fastjson将复杂对象KEY转换成String。如果注解上没有定义，则使用全局配置。|
+|keyConvertor|未定义|指定KEY的转换方式，用于将复杂的KEY类型转换为缓存实现可以接受的类型，JetCache内置的可选值为KeyConvertor.FASTJSON、KeyConvertor.JACKSON、KeyConvertor.JACKSON3和KeyConvertor.NONE。NONE表示不转换，FASTJSON通过fastjson2将复杂对象KEY转换成String（2.8起fastjson1已移除，FASTJSON内部使用fastjson2实现）。如果注解上没有定义，则使用全局配置。|
 
 ## 默认值
 

@@ -55,11 +55,11 @@ jetcache:
   local:
     default:
       type: linkedhashmap
-      keyConvertor: fastjson
+      keyConvertor: fastjson2 #其他可选：fastjson(等同fastjson2)/jackson/jackson3
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #其他可选：fastjson(等同fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       valueEncoder: java
       valueDecoder: java
@@ -127,7 +127,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.util.Pool;
+import redis.clients.jedis.util.Pool;
 
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
@@ -155,7 +155,7 @@ public class JetCacheConfig {
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
                 .createLinkedHashMapCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE);
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE);
         localBuilders.put(CacheConsts.DEFAULT_AREA, localBuilder);
 
         Map remoteBuilders = new HashMap();

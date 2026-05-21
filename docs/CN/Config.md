@@ -9,7 +9,7 @@ jetcache:
     default:
       type: caffeine
       limit: 100
-      keyConvertor: fastjson2 #其他可选：fastjson/jackson
+      keyConvertor: fastjson2 #其他可选：fastjson(等同fastjson2)/jackson/jackson3
       expireAfterWriteInMillis: 100000
     otherArea:
       type: linkedhashmap
@@ -19,7 +19,7 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2 #其他可选：fastjson/jackson
+      keyConvertor: fastjson2 #其他可选：fastjson(等同fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       valueEncoder: java #其他可选：kryo/kryo5
       valueDecoder: java #其他可选：kryo/kryo5
@@ -31,7 +31,7 @@ jetcache:
       port: ${redis.port}
     otherArea:
       type: redis
-      keyConvertor: fastjson2 #其他可选：fastjson/jackson
+      keyConvertor: fastjson2 #其他可选：fastjson(等同fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       valueEncoder: java #其他可选：kryo/kryo5
       valueDecoder: java #其他可选：kryo/kryo5
@@ -53,9 +53,9 @@ jetcache:
 | jetcache.hiddenPackages | 无                           | @Cached和@CreateCache自动生成name的时候，为了不让name太长，hiddenPackages指定的包名前缀被截掉                                                                                                                                   |
 | jetcache.useDefaultLocalExpireInMultiLevelCache | false | 如果设置为true，当cacheType为BOTH且未显式设置localExpire时（包括`@Cached`、`@CreateCache`注解和`QuickConfig` API），本地缓存的过期时间取本地缓存builder上配置的`expireAfterWriteInMillis`与`expire`中的较小值。 |
 | jetcache.[local/remote].${area}.type | 无                           | 缓存类型。tair、redis为当前支持的远程缓存；linkedhashmap、caffeine为当前支持的本地缓存类型                                                                                                                                          |
-| jetcache.[local/remote].${area}.keyConvertor | fastjson2 | key转换器的全局配置，2.6.5+已经支持的keyConvertor：```fastjson2```/```jackson```；<br/>2.6.5-只有一个已经实现的keyConvertor：```fastjson```。仅当使用@CreateCache且缓存类型为LOCAL时可以指定为```none```，此时通过equals方法来识别key。方法缓存必须指定keyConvertor |
-| jetcache.[local/remote].${area}.valueEncoder | java                        | 序列化器的全局配置。仅remote类型的缓存需要指定，2.7+可选```java```/```kryo```/```kryo5```；2.6-可选```java```/```kryo```                                                                                                        |
-| jetcache.[local/remote].${area}.valueDecoder | java                        | 序列化器的全局配置。仅remote类型的缓存需要指定，2.7+可选```java```/```kryo```/```kryo5```；2.6-可选```java```/```kryo```                                                                                                                  |
+| jetcache.[local/remote].${area}.keyConvertor | fastjson2 | key转换器的全局配置。2.8+支持的keyConvertor：```fastjson2```/```jackson```/```jackson3```（```fastjson```也可用，内部使用fastjson2实现）；仅当使用@CreateCache且缓存类型为LOCAL时可以指定为```none```，此时通过equals方法来识别key。方法缓存必须指定keyConvertor |
+| jetcache.[local/remote].${area}.valueEncoder | java                        | 序列化器的全局配置。仅remote类型的缓存需要指定，2.8+可选```java```/```kryo```/```kryo5```（```kryo```和```kryo5```均使用kryo5实现） |
+| jetcache.[local/remote].${area}.valueDecoder | java                        | 反序列化器的全局配置。仅remote类型的缓存需要指定，2.8+可选```java```/```kryo```/```kryo5```（```kryo```和```kryo5```均使用kryo5实现） |
 | jetcache.[local/remote].${area}.limit | 100                         | 每个缓存实例的最大元素的全局配置，仅local类型的缓存需要指定。注意是每个缓存实例的限制，而不是全部，比如这里指定100，然后用@CreateCache创建了两个缓存实例（并且注解上没有设置localLimit属性），那么每个缓存实例的限制都是100                                                                        |
 | jetcache.[local/remote].${area}.expireAfterWriteInMillis | 无穷大                         | 以毫秒为单位指定超时时间的全局配置(以前为defaultExpireInMillis)                                                                                                                                                           |
 | jetcache.remote.${area}.broadcastChannel | 无                           | jetcahe2.7的两级缓存支持更新以后失效其他JVM中的local cache，但多个服务共用redis同一个channel可能会造成广播风暴，需要在这里指定channel，你可以决定多个不同的服务是否共用同一个channel。如果没有指定则不开启。                                                                       |
