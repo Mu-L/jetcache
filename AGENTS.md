@@ -4,9 +4,9 @@
 
 JetCache is a Java cache abstraction library (groupId `com.alicp.jetcache`) providing uniform API over Redis (Jedis/Lettuce/Spring Data/Redisson), Caffeine, and LinkedHashMap. Supports annotations (`@Cached`, `@CacheUpdate`, `@CacheInvalidate`) and programmatic `Cache` API with two-level caching, TTL, auto-refresh, and distributed lock.
 
-- Source/target: Java 8 (compiled with `-parameters`)
+- Source/target: Java 17 (compiled with `-parameters`, enforcer requires JDK 17+)
 - CI JDK: 17 (Temurin)
-- Version: 2.7.x-SNAPSHOT
+- Version: 2.8.x-SNAPSHOT
 
 ## Module Structure
 
@@ -75,8 +75,8 @@ mvn verify               # also runs PMD check (Alibaba p3c ruleset)
 
 ## Conventions
 
-- Both JUnit 4 (`org.junit.Test`) and JUnit 5 (`org.junit.jupiter.api.Test`) are used in tests
-- Test dependencies: JUnit 4 via vintage engine, JUnit Jupiter, Mockito 4.x, Spring Test
+- JUnit Jupiter only (JUnit 4 removed; no vintage engine). JUnit BOM version: 6.x
+- Test dependencies: JUnit Jupiter 6.x, Mockito 4.x, Spring Test
 - PMD uses Alibaba p3c rules (`p3c-pmd:1.3.6`) during `verify` phase
 - The `-parameters` javac flag is required for SpEL annotation key expressions to work (also must be set in IDE settings, not just pom)
 - `samples/` has its own build chain with its own version of jetcache; it is not a module of the main build
@@ -90,7 +90,7 @@ mvn verify               # also runs PMD check (Alibaba p3c ruleset)
 
 ## Compatibility Notes (see `docs/EN/Compatibility.md`)
 
-- Spring/Spring Boot version support varies by jetcache version; current (2.7.4+) supports Spring 5.2.4~6.1.15, Spring Boot 2.2.5~3.2.12
+- Spring/Spring Boot version support varies by jetcache version; current (2.8.0) BOM defaults to Spring Framework 7.x / Spring Boot 4.x / Spring Data Redis 4.x / SLF4J 2.x, but Spring 6.x / Spring Boot 3.x (also Java 17+) is also supported by adjusting BOM properties
 - `jetcache-redis` (Jedis) and `spring-data-redis` (Jedis) use different jedis major versions and **cannot coexist** on classpath
 - Default key convertor changed from `fastjson` to `fastjson2` in 2.7; both can coexist
 - Since 2.8.0, kryo4 is dropped; `com.esotericsoftware:kryo` is now 5.x, and `kryo5` (`com.esotericsoftware.kryo:kryo5`) can coexist — both use kryo5 format (wire-compatible) but different Java package names; old kryo4 data is not readable
