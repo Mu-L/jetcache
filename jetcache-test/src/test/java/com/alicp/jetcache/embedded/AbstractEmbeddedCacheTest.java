@@ -5,7 +5,7 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.support.DefaultCacheMonitorTest;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
@@ -60,7 +60,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc())
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE).buildCache();
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE).buildCache();
         fastjsonKeyCoverterTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc())

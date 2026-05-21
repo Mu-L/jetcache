@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache;
 
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.test.AbstractCacheTest;
@@ -17,7 +17,7 @@ public class MockRemoteCacheTest extends AbstractCacheTest {
     @Test
     public void Test() throws Exception {
         MockRemoteCacheBuilder b = new MockRemoteCacheBuilder();
-        b.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        b.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
         b.setValueDecoder(JavaValueDecoder.INSTANCE);
         b.setValueEncoder(JavaValueEncoder.INSTANCE);
         cache = b.buildCache();

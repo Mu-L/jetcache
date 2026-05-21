@@ -120,12 +120,12 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
         Cache l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(500, TimeUnit.MILLISECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
         RedisClient client = RedisClient.create("redis://127.0.0.1");
         Cache l2Cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")
@@ -149,7 +149,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
         cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
                 .connection(connection)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")
@@ -162,7 +162,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
 
         LoadingCacheTest.loadingCacheTest(RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + ""), 20);
@@ -180,7 +180,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
         int time = 3000;
         cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")

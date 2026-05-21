@@ -2,7 +2,7 @@ package com.alicp.jetcache.redis.springdata;
 
 import com.alicp.jetcache.LoadingCacheTest;
 import com.alicp.jetcache.RefreshCacheTest;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.support.KryoValueDecoder;
@@ -45,7 +45,7 @@ public class RedisSpringDataCacheTest extends AbstractExternalCacheTest {
 
 
         cache = RedisSpringDataCacheBuilder.createBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .connectionFactory(connectionFactory)
@@ -58,13 +58,13 @@ public class RedisSpringDataCacheTest extends AbstractExternalCacheTest {
         expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
 
         LoadingCacheTest.loadingCacheTest(RedisSpringDataCacheBuilder.createBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .connectionFactory(connectionFactory)
                 .keyPrefix(new Random().nextInt() + ""), 0);
         RefreshCacheTest.refreshCacheTest(RedisSpringDataCacheBuilder.createBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .connectionFactory(connectionFactory)
@@ -83,7 +83,7 @@ public class RedisSpringDataCacheTest extends AbstractExternalCacheTest {
         int thread = 10;
         int time = 3000;
         cache = RedisSpringDataCacheBuilder.createBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .connectionFactory(connectionFactory)

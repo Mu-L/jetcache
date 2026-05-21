@@ -4,7 +4,7 @@ import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultMetricsManager;
 import com.alicp.jetcache.support.DefaultCacheMonitorTest;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.external.MockRemoteCache;
 import com.alicp.jetcache.external.MockRemoteCacheBuilder;
@@ -30,19 +30,19 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
         /*
         l2Cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .limit(LIMIT)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
         */
         l2Cache = new MockRemoteCacheBuilder()
                 .limit(LIMIT)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
     }
 
@@ -63,7 +63,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(1000, TimeUnit.MILLISECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .loader(key -> null)
                 .buildCache();
         try {

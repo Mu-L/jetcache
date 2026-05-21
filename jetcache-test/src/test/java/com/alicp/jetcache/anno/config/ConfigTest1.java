@@ -13,7 +13,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.external.MockRemoteCacheBuilder;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.support.KryoValueDecoder;
@@ -54,7 +54,7 @@ public class ConfigTest1 implements ApplicationContextAware {
 
         {
             ExternalCacheConfig c = (ExternalCacheConfig) bean.defualtRemote.config();
-            Assertions.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
+            Assertions.assertSame(Fastjson2KeyConvertor.INSTANCE, c.getKeyConvertor());
             Assertions.assertSame(JavaValueEncoder.INSTANCE, c.getValueEncoder());
             Assertions.assertSame(JavaValueDecoder.INSTANCE, c.getValueDecoder());
             Assertions.assertFalse(c.isExpireAfterAccess());
@@ -69,12 +69,12 @@ public class ConfigTest1 implements ApplicationContextAware {
             Assertions.assertEquals(1000, c.getExpireAfterWriteInMillis());
             Assertions.assertEquals(KryoValueEncoder.class, c.getValueEncoder().getClass());
             Assertions.assertEquals(KryoValueDecoder.class, c.getValueDecoder().getClass());
-            Assertions.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
+            Assertions.assertSame(Fastjson2KeyConvertor.INSTANCE, c.getKeyConvertor());
         }
 
         {
             EmbeddedCacheConfig c = (EmbeddedCacheConfig) bean.defaultLocal.config();
-            Assertions.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
+            Assertions.assertSame(Fastjson2KeyConvertor.INSTANCE, c.getKeyConvertor());
             Assertions.assertEquals(20, c.getLimit());
             Assertions.assertFalse(c.isExpireAfterAccess());
             Assertions.assertEquals(50, c.getExpireAfterWriteInMillis());
@@ -87,7 +87,7 @@ public class ConfigTest1 implements ApplicationContextAware {
             Assertions.assertFalse(c.isExpireAfterAccess());
             Assertions.assertEquals(1000, c.getExpireAfterWriteInMillis());
             Assertions.assertEquals(123, c.getLimit());
-            Assertions.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
+            Assertions.assertSame(Fastjson2KeyConvertor.INSTANCE, c.getKeyConvertor());
         }
     }
 
@@ -111,9 +111,9 @@ public class ConfigTest1 implements ApplicationContextAware {
         public GlobalCacheConfig config() {
             Map localFactories = new HashMap();
             EmbeddedCacheBuilder localFactory = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                    .limit(20).keyConvertor(FastjsonKeyConvertor.INSTANCE).expireAfterWrite(50, TimeUnit.MILLISECONDS);
+                    .limit(20).keyConvertor(Fastjson2KeyConvertor.INSTANCE).expireAfterWrite(50, TimeUnit.MILLISECONDS);
             EmbeddedCacheBuilder localFactory2 = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                    .limit(10).keyConvertor(FastjsonKeyConvertor.INSTANCE).expireAfterAccess(60, TimeUnit.MILLISECONDS);
+                    .limit(10).keyConvertor(Fastjson2KeyConvertor.INSTANCE).expireAfterAccess(60, TimeUnit.MILLISECONDS);
             localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);
             localFactories.put("A1", localFactory2);
 
@@ -122,7 +122,7 @@ public class ConfigTest1 implements ApplicationContextAware {
 
             MockRemoteCacheBuilder remoteBuilder = new MockRemoteCacheBuilder();
             remoteBuilder.setKeyConvertor(null);
-            remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+            remoteBuilder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
             remoteBuilder.setValueEncoder(JavaValueEncoder.INSTANCE);
             remoteBuilder.setValueDecoder(JavaValueDecoder.INSTANCE);
             remoteBuilder.setExpireAfterWriteInMillis(90);
@@ -130,7 +130,7 @@ public class ConfigTest1 implements ApplicationContextAware {
             remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
             remoteBuilder = new MockRemoteCacheBuilder();
-            remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+            remoteBuilder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
             remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
             remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
             remoteBuilder.setExpireAfterAccessInMillis(110);

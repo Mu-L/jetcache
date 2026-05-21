@@ -6,7 +6,7 @@ package com.alicp.jetcache.redis.lettuce;
 import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.redis.AbstractBroadcastManagerTest;
 import com.alicp.jetcache.support.BroadcastManager;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.Kryo5ValueDecoder;
 import com.alicp.jetcache.support.Kryo5ValueEncoder;
 import io.lettuce.core.AbstractRedisClient;
@@ -30,7 +30,7 @@ public class LettuceBroadcastManagerTest extends AbstractBroadcastManagerTest {
     private void doTest(AbstractRedisClient client, StatefulRedisPubSubConnection pubSubConnection) throws Exception {
         BroadcastManager bm = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(Kryo5ValueEncoder.INSTANCE)
                 .valueDecoder(Kryo5ValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")

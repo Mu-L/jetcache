@@ -3,7 +3,7 @@ package com.alicp.jetcache.redisson;
 import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.redis.AbstractBroadcastManagerTest;
 import com.alicp.jetcache.support.BroadcastManager;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import org.junit.jupiter.api.AfterEach;
@@ -39,7 +39,7 @@ public class RedissonBroadcastManagerTest extends AbstractBroadcastManagerTest {
     public void redissonTest() throws Exception {
         final BroadcastManager bm = RedissonCacheBuilder.createBuilder()
                 .redissonClient(client)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")

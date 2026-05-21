@@ -4,7 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
@@ -68,7 +68,7 @@ public class MockStarterTest extends SpringTest {
 
     @Bean
     public Function<Object, Object> myConvertor() {
-        return FastjsonKeyConvertor.INSTANCE;
+        return Fastjson2KeyConvertor.INSTANCE;
     }
 
 }

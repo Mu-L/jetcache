@@ -6,7 +6,7 @@ import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheTest;
 import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheConfig;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import io.lettuce.core.RedisClient;

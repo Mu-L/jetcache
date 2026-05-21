@@ -83,7 +83,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
 
     private RedisCacheBuilder createCacheBuilder(Object jedis) {
         RedisCacheBuilder builder = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "");
@@ -164,7 +164,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
         builder.setReadFromSlave(true);
         builder.setJedisSlavePools(pool2, pool3);
         builder.setSlaveReadWeights(1, 1);
-        builder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        builder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
         builder.setValueEncoder(JavaValueEncoder.INSTANCE);
         builder.setValueDecoder(JavaValueDecoder.INSTANCE);
         builder.setKeyPrefix(new Random().nextInt() + "");

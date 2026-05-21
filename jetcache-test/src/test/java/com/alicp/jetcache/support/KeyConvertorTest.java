@@ -27,7 +27,7 @@ public class KeyConvertorTest {
 
     @Test
     public void testFastjson() {
-        test(FastjsonKeyConvertor.INSTANCE);
+        test(Fastjson2KeyConvertor.INSTANCE);
     }
 
     @Test
