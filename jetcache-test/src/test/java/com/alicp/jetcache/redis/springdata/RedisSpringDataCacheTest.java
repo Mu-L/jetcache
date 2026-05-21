@@ -10,9 +10,6 @@ import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledForJreRange;
-import org.junit.jupiter.api.condition.DisabledOnJre;
-import org.junit.jupiter.api.condition.JRE;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -29,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 public class RedisSpringDataCacheTest extends AbstractExternalCacheTest {
 
     @Test
-    @DisabledForJreRange(max = JRE.JAVA_16,
-            disabledReason = "in profile for java8 to 16, we use spring boot 2.x, it need jedis 3")
     public void jedisTest() throws Exception {
         JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
         connectionFactory.afterPropertiesSet();

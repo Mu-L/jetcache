@@ -41,12 +41,6 @@
         <maven-help-plugin.version>3.2.0</maven-help-plugin.version>
         <xml-maven-plugin.version>1.0.2</xml-maven-plugin.version>
 
-        <!--
-        <spring.framework.version>5.3.23</spring.framework.version>
-        <spring.boot.version>2.7.5</spring.boot.version>
-        <lettuce.version>6.1.10.RELEASE</lettuce.version>
-        -->
-
         <spring.framework.version>6.2.18</spring.framework.version>
         <spring.boot.version>3.5.14</spring.boot.version>
         <spring.data.redis.version>3.5.11</spring.data.redis.version>
@@ -54,11 +48,6 @@
 
         <jedis.version>6.0.0</jedis.version>
         <redisson.version>3.18.0</redisson.version>
-
-        <!--
-        <spring.framework.version>5.2.4.RELEASE</spring.framework.version>
-        <spring.boot.version>2.2.5.RELEASE</spring.boot.version>
-        -->
 
         <jackson.version>2.21.2</jackson.version>
         <jackson3.version>3.1.2</jackson3.version>
