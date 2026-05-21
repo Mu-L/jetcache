@@ -11,6 +11,9 @@ import java.util.function.Function;
 public interface SerialPolicy {
     String JAVA = "JAVA";
 
+    /**
+     * since 2.8.0, the KRYO also use KRYO5 implementation, so KRYO and KRYO5 are same.
+     */
     String KRYO = "KRYO";
 
     /**
