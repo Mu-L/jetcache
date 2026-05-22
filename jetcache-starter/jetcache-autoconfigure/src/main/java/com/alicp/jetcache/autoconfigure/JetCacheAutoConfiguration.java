@@ -79,6 +79,8 @@ public class JetCacheAutoConfiguration {
         _globalCacheConfig.setPenetrationProtect(props.isPenetrationProtect());
         _globalCacheConfig.setEnableMethodCache(props.isEnableMethodCache());
         _globalCacheConfig.setUseDefaultLocalExpireInMultiLevelCache(props.isUseDefaultLocalExpireInMultiLevelCache());
+        _globalCacheConfig.setDecodeFilterEnabled(props.isDecodeFilterEnabled());
+        _globalCacheConfig.setDecodeFilterPatterns(props.getDecodeFilterPatterns());
         _globalCacheConfig.setLocalCacheBuilders(autoConfigureBeans.getLocalCacheBuilders());
         _globalCacheConfig.setRemoteCacheBuilders(autoConfigureBeans.getRemoteCacheBuilders());
         return _globalCacheConfig;

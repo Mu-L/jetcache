@@ -5,6 +5,7 @@ import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.AbstractLifecycle;
+import com.alicp.jetcache.support.DecodeFilter;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
 import com.alicp.jetcache.template.CacheBuilderTemplate;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -68,6 +70,7 @@ public class ConfigProvider extends AbstractLifecycle {
                 eb.setValueDecoder(parseValueDecoder(f.getValue()));
             }
         }
+        initDecodeFilter();
         initCacheMonitorInstallers();
     }
 
@@ -78,6 +81,15 @@ public class ConfigProvider extends AbstractLifecycle {
             if (i instanceof AbstractLifecycle) {
                 ((AbstractLifecycle) i).init();
             }
+        }
+    }
+
+    private void initDecodeFilter() {
+        DecodeFilter f = DecodeFilter.getDefault();
+        f.setEnabled(globalCacheConfig.isDecodeFilterEnabled());
+        List<String> patterns = globalCacheConfig.getDecodeFilterPatterns();
+        if (patterns != null && !patterns.isEmpty()) {
+            f.addAllowPatterns(patterns.toArray(new String[0]));
         }
     }
 

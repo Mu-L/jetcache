@@ -72,6 +72,12 @@ public abstract class AbstractJsonDecoder extends AbstractValueDecoder {
         } else {
             String className = new String(buf, index, classNameLen, StandardCharsets.UTF_8);
             index += classNameLen;
+
+            if (!DecodeFilter.getDefault().isAllowed(className)) {
+                DecodeFilter.logBlocked(className);
+                throw new DecodeFilterException(className);
+            }
+
             Class<?> clazz = Class.forName(className);
             int size = readInt(buf, index);
             index += 4;

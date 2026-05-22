@@ -5,6 +5,7 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +28,8 @@ public class GlobalCacheConfig {
     private boolean penetrationProtect = false;
     private boolean enableMethodCache = true;
     private boolean useDefaultLocalExpireInMultiLevelCache = false;
+    private boolean decodeFilterEnabled = true;
+    private List<String> decodeFilterPatterns;
 
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
@@ -114,5 +117,21 @@ public class GlobalCacheConfig {
 
     public void setUseDefaultLocalExpireInMultiLevelCache(boolean useDefaultLocalExpireInMultiLevelCache) {
         this.useDefaultLocalExpireInMultiLevelCache = useDefaultLocalExpireInMultiLevelCache;
+    }
+
+    public boolean isDecodeFilterEnabled() {
+        return decodeFilterEnabled;
+    }
+
+    public void setDecodeFilterEnabled(boolean decodeFilterEnabled) {
+        this.decodeFilterEnabled = decodeFilterEnabled;
+    }
+
+    public List<String> getDecodeFilterPatterns() {
+        return decodeFilterPatterns;
+    }
+
+    public void setDecodeFilterPatterns(List<String> decodeFilterPatterns) {
+        this.decodeFilterPatterns = decodeFilterPatterns;
     }
 }

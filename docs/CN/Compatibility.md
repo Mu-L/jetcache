@@ -17,6 +17,24 @@ jetcache在以下spring/spring-boot版本下通过了测试，如果你只用部
 * 不再支持kryo4，`com.esotericsoftware:kryo`已升级到5.x，`SerialPolicy`中的`KRYO`常量现在也使用kryo5实现。kryo4序列化数据与kryo5不兼容，升级前需等待旧缓存过期或手动清空
 * 移除了`IDENTITY_NUMBER_KRYO4`常量
 * `areaInCacheName`默认值已改为`false`（2.8.0之前为`true`）。
+* 新增反序列化过滤器机制（默认开启）。这是一个**破坏性变更**，如果缓存值中包含不在默认允许列表中的自定义类，升级后反序列化会直接失败。
+  
+  **升级步骤**：由于旧版本没有此配置项，无法在升级前预配置。推荐以下两种方式：
+  
+  方式一（推荐）：升级JetCache的**同时**添加`decodeFilterPatterns`配置，将自定义类所在的包名加入白名单。例如：
+  ```yaml
+  jetcache:
+    decodeFilterPatterns:
+      - com.yourcompany.
+  ```
+  
+  方式二（保守）：升级时先关闭过滤器，验证功能正常后再逐步添加白名单并开启（**不建议在生产环境长期关闭**）：
+  ```yaml
+  jetcache:
+    decodeFilterEnabled: false
+  ```
+  
+  关于默认允许列表包含哪些包、以及详细的配置说明，请参见[配置文档](Config.md)中的"反序列化过滤器配置"章节。
 
 ## 2.7.4
 * 默认传递依赖spring-boot 3.1.3，spring-framework 6.0.11，slf4j-api 2.x

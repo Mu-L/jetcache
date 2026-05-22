@@ -16,7 +16,25 @@ jetcache tested with below spring/spring-boot versions
 * Removed Spring XML namespace support (`<jetcache:xxx>` tags in XML configuration are no longer available)
 * kryo4 is no longer supported, `com.esotericsoftware:kryo` is upgraded to 5.x. The `KRYO` constant in `SerialPolicy` now uses kryo5 implementation internally. kryo4 serialized data is not compatible with kryo5, wait for old cache entries to expire or clear cache before upgrading
 * Removed `IDENTITY_NUMBER_KRYO4` constant
-* `areaInCacheName` default value is now `false` (was `true` in versions prior to 2.8.0). 
+* `areaInCacheName` default value is now `false` (was `true` in versions prior to 2.8.0).
+* Added deserialization filter mechanism (enabled by default). This is a **breaking change** — if your cached values contain custom classes not in the default allowed list, deserialization will fail immediately after upgrading.
+  
+  **Upgrade steps**: Since older versions do not have this configuration option, pre-configuration before upgrading is not possible. Two recommended approaches:
+  
+  Option 1 (recommended): Add `decodeFilterPatterns` configuration **at the same time** as upgrading JetCache, including the package names of your custom classes in the allow list. For example:
+  ```yaml
+  jetcache:
+    decodeFilterPatterns:
+      - com.yourcompany.
+  ```
+  
+  Option 2 (conservative): Disable the filter during upgrade, verify everything works, then gradually add allow list entries and re-enable (**not recommended for long-term use in production**):
+  ```yaml
+  jetcache:
+    decodeFilterEnabled: false
+  ```
+  
+  See the "Deserialization Filter Configuration" section in the [configuration docs](Config.md) for the list of default allowed packages and detailed setup instructions. 
 
 ## 2.7.4
 * use spring-boot 3.1.3, spring-framework 6.0.11, slf4j-api 2.x as default

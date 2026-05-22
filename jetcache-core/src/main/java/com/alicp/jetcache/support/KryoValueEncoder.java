@@ -4,8 +4,7 @@ import com.alicp.jetcache.anno.SerialPolicy;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
-
-import java.util.Arrays;
+import com.esotericsoftware.kryo.util.MapReferenceResolver;
 
 /**
  * Created on 2016/10/4.
@@ -38,7 +37,7 @@ public class KryoValueEncoder extends AbstractValueEncoder {
         final Output output;
         final Kryo kryo;
         public KryoCache(){
-            kryo = new Kryo();
+            kryo = new Kryo(new KryoClassResolver(), new MapReferenceResolver());
             kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
             kryo.setRegistrationRequired(false);
             output = new Output(INIT_BUFFER_SIZE, -1);
