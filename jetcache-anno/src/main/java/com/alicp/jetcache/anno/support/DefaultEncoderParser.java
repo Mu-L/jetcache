@@ -51,11 +51,11 @@ public class DefaultEncoderParser implements EncoderParser {
         valueEncoder = uri.getPath();
         boolean useIdentityNumber = isUseIdentityNumber(uri);
         if (SerialPolicy.KRYO.equalsIgnoreCase(valueEncoder)) {
-            return new KryoValueEncoder(useIdentityNumber);
+            return new KryoValueEncoder(useIdentityNumber, KryoValueEncoder.DEFAULT_POOL);
         } else if (SerialPolicy.JAVA.equalsIgnoreCase(valueEncoder)) {
             return new JavaValueEncoder(useIdentityNumber);
         } else if (SerialPolicy.KRYO5.equalsIgnoreCase(valueEncoder)) {
-            return new Kryo5ValueEncoder(useIdentityNumber);
+            return new Kryo5ValueEncoder(useIdentityNumber, Kryo5ValueEncoder.DEFAULT_POOL);
         }/* else if (SerialPolicy.FASTJSON2.equalsIgnoreCase(valueEncoder)) {
             return new Fastjson2ValueEncoder(useIdentityNumber);
         }*/ else {
@@ -82,11 +82,11 @@ public class DefaultEncoderParser implements EncoderParser {
         valueDecoder = uri.getPath();
         boolean useIdentityNumber = isUseIdentityNumber(uri);
         if (SerialPolicy.KRYO.equalsIgnoreCase(valueDecoder)) {
-            return new KryoValueDecoder(useIdentityNumber);
+            return new KryoValueDecoder(useIdentityNumber, KryoValueEncoder.DEFAULT_POOL);
         } else if (SerialPolicy.JAVA.equalsIgnoreCase(valueDecoder)) {
             return javaValueDecoder(useIdentityNumber);
         } else if (SerialPolicy.KRYO5.equalsIgnoreCase(valueDecoder)) {
-            return new Kryo5ValueDecoder(useIdentityNumber);
+            return new Kryo5ValueDecoder(useIdentityNumber, Kryo5ValueEncoder.DEFAULT_POOL);
         }/* else if (SerialPolicy.FASTJSON2.equalsIgnoreCase(valueDecoder)) {
             return new Kryo5ValueDecoder(useIdentityNumber);
         }*/ else {

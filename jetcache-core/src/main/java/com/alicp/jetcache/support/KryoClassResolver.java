@@ -16,17 +16,22 @@ import com.esotericsoftware.kryo.util.ObjectMap;
  * from {@code com.esotericsoftware.kryo:kryo5}). This resolver handles the
  * {@code com.esotericsoftware.kryo} package path.
  * <p>
- * Filter check logic is in {@link AbstractKryoClassResolver}.
+ * Filter check logic is in {@link KryoClassResolverUtil}.
  *
  * @author huangli
  */
 class KryoClassResolver extends DefaultClassResolver {
+    private final DecodeFilter decodeFilter;
+
+    public KryoClassResolver(DecodeFilter decodeFilter) {
+        this.decodeFilter = decodeFilter;
+    }
 
     @Override
     public Registration readClass(Input input) {
         Registration registration = super.readClass(input);
         if (registration != null) {
-            AbstractKryoClassResolver.checkAllowed(registration.getType());
+            KryoClassResolverUtil.checkAllowed(registration.getType(), decodeFilter);
         }
         return registration;
     }
@@ -44,11 +49,11 @@ class KryoClassResolver extends DefaultClassResolver {
         Class<?> type = nameIdToClass.get(nameId);
         if (type == null) {
             String className = input.readString();
-            AbstractKryoClassResolver.checkAllowed(className);
+            KryoClassResolverUtil.checkAllowed(className, decodeFilter);
             type = super.getTypeByName(className);
             if (type == null) {
                 try {
-                    type = AbstractKryoClassResolver.loadClass(className, kryo.getClassLoader(), Kryo.class.getClassLoader());
+                    type = KryoClassResolverUtil.loadClass(className, kryo.getClassLoader(), Kryo.class.getClassLoader());
                 } catch (ClassNotFoundException e) {
                     throw new KryoException("Unable to find class: " + className, e);
                 }
@@ -59,13 +64,13 @@ class KryoClassResolver extends DefaultClassResolver {
             }
             nameIdToClass.put(nameId, type);
         }
-        AbstractKryoClassResolver.checkAllowed(type);
+        KryoClassResolverUtil.checkAllowed(type, decodeFilter);
         return kryo.getRegistration(type);
     }
 
     @Override
     protected Class<?> getTypeByName(String className) {
-        AbstractKryoClassResolver.checkAllowed(className);
+        KryoClassResolverUtil.checkAllowed(className, decodeFilter);
         return super.getTypeByName(className);
     }
 }

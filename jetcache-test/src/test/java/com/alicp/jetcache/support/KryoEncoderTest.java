@@ -21,8 +21,8 @@ public class KryoEncoderTest extends AbstractEncoderTest {
         decoder = KryoValueDecoder.INSTANCE;
         baseTest();
 
-        encoder = new KryoValueEncoder(false);
-        decoder = new KryoValueDecoder(false);
+        encoder = new KryoValueEncoder(false, KryoValueEncoder.DEFAULT_POOL);
+        decoder = new KryoValueDecoder(false, KryoValueEncoder.DEFAULT_POOL);
         baseTest();
     }
 
@@ -55,10 +55,10 @@ public class KryoEncoderTest extends AbstractEncoderTest {
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
 
         encoder = KryoValueEncoder.INSTANCE;
-        decoder = new KryoValueDecoder(false);
+        decoder = new KryoValueDecoder(false, KryoValueEncoder.DEFAULT_POOL);
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
 
-        encoder = new KryoValueEncoder(false);
+        encoder = new KryoValueEncoder(false, KryoValueEncoder.DEFAULT_POOL);
         decoder = KryoValueDecoder.INSTANCE;
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
     }

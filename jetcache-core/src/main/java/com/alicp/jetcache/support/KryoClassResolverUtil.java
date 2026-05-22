@@ -1,28 +1,28 @@
 package com.alicp.jetcache.support;
 
-abstract class AbstractKryoClassResolver {
+final class KryoClassResolverUtil {
 
     private static final String[] PRIMITIVE_TYPE_NAMES = {
             "boolean", "byte", "char", "short", "int", "long", "float", "double", "void"
     };
 
-    protected static void checkAllowed(Class<?> type) {
+    static void checkAllowed(Class<?> type, DecodeFilter decodeFilter) {
         if (type != null && !type.isPrimitive()) {
-            checkAllowed(type.getName());
+            checkAllowed(type.getName(), decodeFilter);
         }
     }
 
-    protected static void checkAllowed(String className) {
+    static void checkAllowed(String className, DecodeFilter decodeFilter) {
         if (isPrimitiveTypeName(className)) {
             return;
         }
-        if (DecodeFilter.getDefault().isEnabled() && !DecodeFilter.getDefault().isAllowed(className)) {
+        if (decodeFilter.isEnabled() && !decodeFilter.isAllowed(className)) {
             DecodeFilter.logBlocked(className);
             throw new DecodeFilterException(className);
         }
     }
 
-    protected static Class<?> loadClass(String className, ClassLoader primary, ClassLoader fallback) throws ClassNotFoundException {
+    static Class<?> loadClass(String className, ClassLoader primary, ClassLoader fallback) throws ClassNotFoundException {
         try {
             return Class.forName(className, false, primary);
         } catch (ClassNotFoundException e) {

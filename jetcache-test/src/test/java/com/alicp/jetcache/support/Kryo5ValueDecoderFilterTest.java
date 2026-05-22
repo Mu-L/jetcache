@@ -58,8 +58,8 @@ public class Kryo5ValueDecoderFilterTest {
     @Test
     public void testUseIdentityNumberFalsePath() {
         decodeFilter.addAllowPatterns("org.example.");
-        byte[] bytes = new Kryo5ValueEncoder(false).apply(new KryoFilterTestUser("test"));
-        Object result = new Kryo5ValueDecoder(false).apply(bytes);
+        byte[] bytes = new Kryo5ValueEncoder(false, Kryo5ValueEncoder.DEFAULT_POOL).apply(new KryoFilterTestUser("test"));
+        Object result = new Kryo5ValueDecoder(false, Kryo5ValueEncoder.DEFAULT_POOL).apply(bytes);
         KryoFilterTestUser user = assertInstanceOf(KryoFilterTestUser.class, result);
         assertEquals("test", user.getName());
     }

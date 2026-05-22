@@ -15,15 +15,24 @@ import com.esotericsoftware.kryo.util.MapReferenceResolver;
  */
 public class KryoValueEncoder extends AbstractValueEncoder {
 
-    public static final KryoValueEncoder INSTANCE = new KryoValueEncoder(true);
+    public static final ObjectPool<KryoCache> DEFAULT_POOL = new ObjectPool<>(16,
+            new KryoCacheFactory(DecodeFilter.getDefault()));
+
+    public static final KryoValueEncoder INSTANCE = new KryoValueEncoder(true, DEFAULT_POOL);
 
     private static final int INIT_BUFFER_SIZE = 2048;
 
-    //Default size = 32K
-    static ObjectPool<KryoCache> kryoCacheObjectPool = new ObjectPool<>(16, new ObjectPool.ObjectFactory<KryoCache>() {
+    private final ObjectPool<KryoCache> pool;
+
+    public static class KryoCacheFactory implements ObjectPool.ObjectFactory<KryoCache> {
+        private final DecodeFilter decodeFilter;
+        public KryoCacheFactory(DecodeFilter decodeFilter) {
+            this.decodeFilter = decodeFilter;
+        }
+
         @Override
         public KryoCache create() {
-            return new KryoCache();
+            return new KryoCache(decodeFilter);
         }
 
         @Override
@@ -31,40 +40,42 @@ public class KryoValueEncoder extends AbstractValueEncoder {
             obj.getKryo().reset();
             obj.getOutput().reset();
         }
-    });
+    }
 
     public static class KryoCache {
         final Output output;
         final Kryo kryo;
-        public KryoCache(){
-            kryo = new Kryo(new KryoClassResolver(), new MapReferenceResolver());
+        public KryoCache(DecodeFilter decodeFilter) {
+            kryo = new Kryo(new KryoClassResolver(decodeFilter), new MapReferenceResolver());
             kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
             kryo.setRegistrationRequired(false);
             output = new Output(INIT_BUFFER_SIZE, -1);
         }
 
-        public Output getOutput(){
+        public Output getOutput() {
             return output;
         }
+
         public Kryo getKryo(){
             return kryo;
         }
+
     }
 
-    public KryoValueEncoder(boolean useIdentityNumber) {
+    public KryoValueEncoder(boolean useIdentityNumber, ObjectPool<KryoCache> pool) {
         super(useIdentityNumber);
+        this.pool = pool;
     }
 
     @Override
     public byte[] apply(Object value) {
         KryoCache kryoCache = null;
         try {
-            kryoCache = kryoCacheObjectPool.borrowObject();
-            Output output = kryoCache.getOutput();
+            kryoCache = pool.borrowObject();
             if (useIdentityNumber) {
-                writeInt(output, SerialPolicy.IDENTITY_NUMBER_KRYO5);
+                writeInt(kryoCache.getOutput(), SerialPolicy.IDENTITY_NUMBER_KRYO5);
             }
-            kryoCache.getKryo().writeClassAndObject(output, value);
+            kryoCache.getKryo().writeClassAndObject(kryoCache.getOutput(), value);
             return kryoCache.getOutput().toBytes();
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder("Kryo Encode error. ");
@@ -72,7 +83,7 @@ public class KryoValueEncoder extends AbstractValueEncoder {
             throw new CacheEncodeException(sb.toString(), e);
         } finally {
             if (kryoCache != null) {
-                kryoCacheObjectPool.returnObject(kryoCache);
+                pool.returnObject(kryoCache);
             }
         }
     }

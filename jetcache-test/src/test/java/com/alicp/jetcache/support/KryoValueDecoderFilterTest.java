@@ -58,8 +58,8 @@ public class KryoValueDecoderFilterTest {
     @Test
     public void testUseIdentityNumberFalsePath() {
         decodeFilter.addAllowPatterns("org.example.");
-        byte[] bytes = new KryoValueEncoder(false).apply(new KryoFilterTestUser("test"));
-        Object result = new KryoValueDecoder(false).apply(bytes);
+        byte[] bytes = new KryoValueEncoder(false, KryoValueEncoder.DEFAULT_POOL).apply(new KryoFilterTestUser("test"));
+        Object result = new KryoValueDecoder(false, KryoValueEncoder.DEFAULT_POOL).apply(bytes);
         KryoFilterTestUser user = assertInstanceOf(KryoFilterTestUser.class, result);
         assertEquals("test", user.getName());
     }

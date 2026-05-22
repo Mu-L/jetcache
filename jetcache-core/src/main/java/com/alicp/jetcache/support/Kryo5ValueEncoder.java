@@ -13,29 +13,38 @@ import com.esotericsoftware.kryo.kryo5.util.MapReferenceResolver;
  */
 public class Kryo5ValueEncoder extends AbstractValueEncoder {
 
-    public static final Kryo5ValueEncoder INSTANCE = new Kryo5ValueEncoder(true);
+    public static final ObjectPool<KryoCache> DEFAULT_POOL = new ObjectPool<>(16,
+            new KryoCacheFactory(DecodeFilter.getDefault()));
+
+    public static final Kryo5ValueEncoder INSTANCE = new Kryo5ValueEncoder(true, DEFAULT_POOL);
 
     private static final int INIT_BUFFER_SIZE = 2048;
 
-    //Default size = 32K
-    static ObjectPool<Kryo5Cache> kryoCacheObjectPool = new ObjectPool<>(16, new ObjectPool.ObjectFactory<Kryo5Cache>() {
-        @Override
-        public Kryo5Cache create() {
-            return new Kryo5Cache();
+    private final ObjectPool<KryoCache> pool;
+
+    public static class KryoCacheFactory implements ObjectPool.ObjectFactory<KryoCache> {
+        private final DecodeFilter decodeFilter;
+        public KryoCacheFactory(DecodeFilter decodeFilter) {
+            this.decodeFilter = decodeFilter;
         }
 
         @Override
-        public void reset(Kryo5Cache obj) {
+        public KryoCache create() {
+            return new KryoCache(decodeFilter);
+        }
+
+        @Override
+        public void reset(KryoCache obj) {
             obj.getKryo().reset();
             obj.getOutput().reset();
         }
-    });
+    }
 
-    public static class Kryo5Cache {
+    public static class KryoCache {
         final Output output;
         final Kryo kryo;
-        public Kryo5Cache(){
-            kryo = new Kryo(new Kryo5ClassResolver(), new MapReferenceResolver());
+        public KryoCache(DecodeFilter decodeFilter) {
+            kryo = new Kryo(new Kryo5ClassResolver(decodeFilter), new MapReferenceResolver());
             kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
             kryo.setRegistrationRequired(false);
             output = new Output(INIT_BUFFER_SIZE, -1);
@@ -51,15 +60,16 @@ public class Kryo5ValueEncoder extends AbstractValueEncoder {
 
     }
 
-    public Kryo5ValueEncoder(boolean useIdentityNumber) {
+    public Kryo5ValueEncoder(boolean useIdentityNumber, ObjectPool<KryoCache> pool) {
         super(useIdentityNumber);
+        this.pool = pool;
     }
 
     @Override
     public byte[] apply(Object value) {
-        Kryo5Cache kryoCache = null;
+        KryoCache kryoCache = null;
         try {
-            kryoCache = kryoCacheObjectPool.borrowObject();
+            kryoCache = pool.borrowObject();
             if (useIdentityNumber) {
                 writeInt(kryoCache.getOutput(), SerialPolicy.IDENTITY_NUMBER_KRYO5);
             }
@@ -71,7 +81,7 @@ public class Kryo5ValueEncoder extends AbstractValueEncoder {
             throw new CacheEncodeException(sb.toString(), e);
         } finally {
             if (kryoCache != null) {
-                kryoCacheObjectPool.returnObject(kryoCache);
+                pool.returnObject(kryoCache);
             }
         }
     }
