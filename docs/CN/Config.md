@@ -79,7 +79,7 @@ JetCache 2.8.x 默认开启反序列化过滤器，默认允许列表如下：
 | `java.lang` | 包名匹配 | String、Integer 等直接类，不含子包（如 reflect、invoke） |
 | `java.util.` | 前缀匹配 | 集合类及其子包（如 HashMap、concurrent.ConcurrentHashMap） |
 | `java.time.` | 前缀匹配 | 日期时间类（如 LocalDate、Duration） |
-| `java.math.` | 前缀匹配 | BigDecimal、BigInteger 等 |
+| `java.math` | 包名匹配 | BigDecimal、BigInteger 等直接类（该包无子包） |
 | `java.net` | 包名匹配 | URI、URL 等直接类，不含子包 |
 | `com.alicp.jetcache.` | 前缀匹配 | JetCache 内部类 |
 
@@ -93,6 +93,8 @@ jetcache:
     - org.myapp.dto         # 包名匹配：org.myapp.dto 包下的直接类（不含子包）
     - org.myapp.dto.UserDTO # 精确匹配：仅允许这一个类
 ```
+
+**过滤规则**：过滤器同时维护允许列表和拒绝列表，拒绝列表优先级最高，即使用户添加了允许模式也无法绕过。
 
 **模式匹配规则**：
 - **前缀匹配**（以`.`结尾）：匹配该包及其所有子包下的类。例如 `com.example.` 匹配 `com.example.Foo`、`com.example.sub.Bar` 等。

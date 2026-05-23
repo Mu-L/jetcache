@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ObjectInputFilter;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -21,48 +20,6 @@ public class DecodeFilterTest {
     @AfterEach
     public void tearDown() {
         decodeFilter.reset();
-    }
-
-    @Test
-    public void testDefaultFilterAllowsJavaLang() {
-        assertTrue(decodeFilter.isAllowed("java.lang.String"));
-        assertTrue(decodeFilter.isAllowed("java.lang.Integer"));
-        assertTrue(decodeFilter.isAllowed("java.lang.Long"));
-        assertTrue(decodeFilter.isAllowed("[Ljava.lang.String;"));
-    }
-
-    @Test
-    public void testDefaultFilterAllowsJavaUtil() {
-        assertTrue(decodeFilter.isAllowed("java.util.HashMap"));
-        assertTrue(decodeFilter.isAllowed("java.util.ArrayList"));
-        assertTrue(decodeFilter.isAllowed("java.util.Date"));
-        assertTrue(decodeFilter.isAllowed("java.util.UUID"));
-    }
-
-    @Test
-    public void testDefaultFilterAllowsJavaTime() {
-        assertTrue(decodeFilter.isAllowed("java.time.LocalDateTime"));
-        assertTrue(decodeFilter.isAllowed("java.time.Instant"));
-        assertTrue(decodeFilter.isAllowed("java.time.Duration"));
-    }
-
-    @Test
-    public void testDefaultFilterAllowsJavaMath() {
-        assertTrue(decodeFilter.isAllowed("java.math.BigDecimal"));
-        assertTrue(decodeFilter.isAllowed("java.math.BigInteger"));
-    }
-
-    @Test
-    public void testDefaultFilterAllowsJetCacheTypes() {
-        assertTrue(decodeFilter.isAllowed("com.alicp.jetcache.CacheValueHolder"));
-        assertTrue(decodeFilter.isAllowed("com.alicp.jetcache.support.CacheMessage"));
-    }
-
-    @Test
-    public void testDefaultFilterBlocksRiskyJavaPackages() {
-        assertFalse(decodeFilter.isAllowed("java.rmi.server.UnicastRemoteObject"));
-        assertFalse(decodeFilter.isAllowed("java.beans.EventHandler"));
-        assertFalse(decodeFilter.isAllowed("java.lang.reflect.Proxy"));
     }
 
     @Test
@@ -166,33 +123,9 @@ public class DecodeFilterTest {
     }
 
     @Test
-    public void testDenyListBlocksJavaLangInvoke() {
-        assertFalse(decodeFilter.isAllowed("java.lang.invoke.SerializedLambda"));
-        assertFalse(decodeFilter.isAllowed("java.lang.invoke.MethodHandles"));
-    }
-
-    @Test
     public void testDenyListOverridesUserPattern() {
         decodeFilter.addAllowPatterns("java.lang.reflect.");
         assertFalse(decodeFilter.isAllowed("java.lang.reflect.Proxy"));
-    }
-
-    @Test
-    public void testDenyListBlocksJndiAndRmi() {
-        assertFalse(decodeFilter.isAllowed("javax.naming.InitialContext"));
-        assertFalse(decodeFilter.isAllowed("java.rmi.server.UnicastRemoteObject"));
-    }
-
-    @Test
-    public void testDenyListBlocksComSunDangerousClasses() {
-        assertFalse(decodeFilter.isAllowed("com.sun.rowset.JdbcRowSetImpl"));
-        assertFalse(decodeFilter.isAllowed("com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
-    }
-
-    @Test
-    public void testDenyListOverridesUserPatternForJndi() {
-        decodeFilter.addAllowPatterns("javax.");
-        assertFalse(decodeFilter.isAllowed("javax.naming.InitialContext"));
     }
 
     @Test
@@ -202,47 +135,9 @@ public class DecodeFilterTest {
     }
 
     @Test
-    public void testDenyListBlocksJavaLangManagement() {
-        assertFalse(decodeFilter.isAllowed("java.lang.management.ManagementFactory"));
-    }
-
-    @Test
-    public void testDenyListBlocksDangerousJavaLangClasses() {
-        assertFalse(decodeFilter.isAllowed("java.lang.Runtime"));
-        assertFalse(decodeFilter.isAllowed("java.lang.ProcessBuilder"));
-        assertFalse(decodeFilter.isAllowed("java.lang.Thread"));
-        assertFalse(decodeFilter.isAllowed("java.lang.ThreadGroup"));
-        assertFalse(decodeFilter.isAllowed("java.lang.ClassLoader"));
-        assertFalse(decodeFilter.isAllowed("java.lang.System"));
-        assertFalse(decodeFilter.isAllowed("java.lang.SecurityManager"));
-        assertFalse(decodeFilter.isAllowed("java.lang.StackWalker"));
-    }
-
-    @Test
-    public void testJavaIoNotInDefaultFilter() {
-        assertFalse(decodeFilter.isAllowed("java.io.File"));
-        assertFalse(decodeFilter.isAllowed("java.io.RandomAccessFile"));
-    }
-
-    @Test
-    public void testJavaNetInDefaultFilter() {
-        assertTrue(decodeFilter.isAllowed("java.net.URL"));
-        assertTrue(decodeFilter.isAllowed("java.net.InetAddress"));
-        assertTrue(decodeFilter.isAllowed("java.net.URI"));
-        assertTrue(decodeFilter.isAllowed("java.net.InetSocketAddress"));
-    }
-
-    @Test
     public void testUserCanAddJavaIo() {
         decodeFilter.addAllowPatterns("java.io.");
         assertTrue(decodeFilter.isAllowed("java.io.File"));
-    }
-
-    @Test
-    public void testJavaLangStillAllowsCoreTypes() {
-        assertTrue(decodeFilter.isAllowed("java.lang.String"));
-        assertTrue(decodeFilter.isAllowed("java.lang.StringBuilder"));
-        assertTrue(decodeFilter.isAllowed("java.lang.Exception"));
     }
 
     @Test

@@ -79,7 +79,7 @@ JetCache 2.8.x enables deserialization filter by default. The default allow list
 | `java.lang` | Package match | Direct classes only (e.g. String, Integer), excluding subpackages (reflect, invoke) |
 | `java.util.` | Prefix match | Collections and subpackages (e.g. HashMap, concurrent.ConcurrentHashMap) |
 | `java.time.` | Prefix match | Date/time classes (e.g. LocalDate, Duration) |
-| `java.math.` | Prefix match | BigDecimal, BigInteger, etc. |
+| `java.math` | Package match | BigDecimal, BigInteger, etc. (no subpackages exist) |
 | `java.net` | Package match | URI, URL, etc. Direct classes only, excluding subpackages |
 | `com.alicp.jetcache.` | Prefix match | JetCache internal classes |
 
@@ -93,6 +93,8 @@ jetcache:
     - org.myapp.dto         # package match: direct classes in org.myapp.dto (no subpackages)
     - org.myapp.dto.UserDTO # exact match: only this specific class
 ```
+
+**Filter rules**: The filter maintains both an allow list and a deny list. The deny list takes the highest priority and cannot be overridden by user-defined allow patterns.
 
 **Pattern matching rules**:
 - **Prefix match** (ends with `.`): matches all classes in the package and all subpackages. For example, `com.example.` matches `com.example.Foo`, `com.example.sub.Bar`, etc.

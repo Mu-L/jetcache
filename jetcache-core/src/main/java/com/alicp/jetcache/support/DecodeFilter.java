@@ -39,7 +39,8 @@ public class DecodeFilter {
      * Default allow patterns: commonly used Java packages for cache values.
      * <p>
      * "java.lang" uses package-only matching so subpackages like reflect/invoke are automatically excluded.
-     * "java.util." / "java.time." / "java.math." use prefix matching to include subpackages.
+     * "java.util." / "java.time." use prefix matching to include subpackages.
+     * "java.math" uses package-only matching (no subpackages exist under java.math).
      * "java.net" uses package-only matching (direct classes only, excluding subpackages like spi).
      * <p>
      * java.io is NOT included by default; users can add it via configuration if needed.
@@ -48,15 +49,15 @@ public class DecodeFilter {
             "java.lang",
             "java.util.",
             "java.time.",
-            "java.math.",
+            "java.math",
             "java.net",
             "com.alicp.jetcache."
     );
 
     /**
-     * Default deny patterns: explicitly blocked subpackages and exact class names.
+     * Default deny patterns: explicitly blocked packages, subpackages and exact class names.
      * <p>
-     * Subpackage denials are defense-in-depth for cases where users add broad prefix patterns.
+     * Deny patterns have highest priority and cannot be overridden by allow patterns.
      */
     public static final Set<String> DEFAULT_DENY_PATTERNS = Set.of(
             // java.lang dangerous subpackages (defense-in-depth for "java.lang." prefix)
@@ -69,6 +70,9 @@ public class DecodeFilter {
             // java.lang dangerous classes
             "java.lang.Runtime",
             "java.lang.ProcessBuilder",
+            "java.lang.ProcessImpl",
+            "java.lang.UNIXProcess",
+            "java.lang.Shutdown",
             "java.lang.Thread",
             "java.lang.ThreadGroup",
             "java.lang.ClassLoader",
@@ -82,9 +86,58 @@ public class DecodeFilter {
             "java.rmi.",
             // javax.script (ScriptEngineManager gadget)
             "javax.script.",
-            // com.sun dangerous classes (JdbcRowSetImpl, XSLT, etc.)
-            "com.sun.rowset.",
-            "com.sun.org.apache.xalan."
+            // javax.management (JMX MLet/remote gadget chains, defense-in-depth: ClassLoader/RMI already blocked)
+            "javax.management.",
+            // JDK internal classes (com.sun/sun are JDK internal APIs, no business classes exist here)
+            "com.sun.",
+            "sun.",
+            // Apache Commons Collections gadget chains (InvokerTransformer, ChainedTransformer, LazyMap etc.)
+            "org.apache.commons.collections.functors.",
+            "org.apache.commons.collections.map.LazyMap",
+            "org.apache.commons.collections4.functors.",
+            "org.apache.commons.collections4.map.LazyMap",
+            // Apache Commons BeanUtils (BeanComparator gadget)
+            "org.apache.commons.beanutils.",
+            // Groovy runtime (MethodClosure, ConvertedClosure gadgets)
+            "org.codehaus.groovy.runtime.",
+            "org.codehaus.groovy.reflection.",
+            // C3P0 (PoolBackedDataSource gadget)
+            "com.mchange.v2.",
+            // Spring expression language (SpEL injection)
+            "org.springframework.expression.",
+            // Spring framework gadget chains (defense-in-depth: sink classes blocked by com.sun.)
+            "org.springframework.aop.framework.JdkDynamicAopProxy",
+            "org.springframework.core.SerializableTypeWrapper$MethodInvokeTypeProvider",
+            // AspectJ Weaver (defense-in-depth: chain also requires Commons Collections which is already blocked)
+            "org.aspectj.weaver.",
+            // Hibernate gadget chains (TypedValue hashCode trigger → ComponentType → TemplatesImpl/JNDI)
+            "org.hibernate.engine.spi.TypedValue",
+            "org.hibernate.type.ComponentType",
+            "org.hibernate.tuple.component.AbstractComponentTuplizer",
+            "org.hibernate.property.access.spi.GetterMethodImpl",
+            // Hibernate 4.x getter (ysoserial uses this instead of GetterMethodImpl for 4.x)
+            "org.hibernate.property.BasicPropertyAccessor$BasicGetter",
+            "org.hibernate.internal.util.ValueHolder",
+            // Hessian (gadget chains)
+            "com.caucho.",
+            // javassist (bytecode manipulation used in gadget chains)
+            "javassist.",
+            // Jython (Python script execution)
+            "org.python.",
+            // Mozilla Rhino (JavaScript execution)
+            "org.mozilla.javascript.",
+            // BeanShell (script execution)
+            "bsh.",
+            // Clojure (script execution)
+            "clojure.",
+            // ROME (ToStringBean/ObjectBean gadget chains)
+            "com.rometools.",
+            // Vaadin (NestedMethodProperty gadget chain)
+            "com.vaadin.",
+            // Apache Click (Column$ColumnComparator gadget chain)
+            "org.apache.click.",
+            // Apache Wicket (DiskFileItem file write gadget)
+            "org.apache.wicket."
     );
 
     private static final DecodeFilter INSTANCE = new DecodeFilter();
