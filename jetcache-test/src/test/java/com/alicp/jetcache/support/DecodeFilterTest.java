@@ -3,7 +3,9 @@ package com.alicp.jetcache.support;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ObjectInputFilter;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -295,5 +297,165 @@ public class DecodeFilterTest {
         decodeFilter.addAllowPatterns("com.example.MyClass");
         assertFalse(decodeFilter.isAllowed("com.example.MyClassExtra"));
         assertFalse(decodeFilter.isAllowed("com.example.MyClass$Inner"));
+    }
+
+    @Test
+    public void testCustomConstructor() {
+        DecodeFilter custom = new DecodeFilter(
+                Set.of("com.foo."),
+                Set.of("com.foo.evil.")
+        );
+        assertTrue(custom.isAllowed("com.foo.Bar"));
+        assertFalse(custom.isAllowed("com.foo.evil.Attack"));
+        assertFalse(custom.isAllowed("java.lang.String"));
+        assertFalse(custom.isEnabled() == false);
+    }
+
+    @Test
+    public void testRemoveAllowPatterns() {
+        decodeFilter.addAllowPatterns("com.example.");
+        assertTrue(decodeFilter.isAllowed("com.example.User"));
+        decodeFilter.removeAllowPatterns("com.example.");
+        assertFalse(decodeFilter.isAllowed("com.example.User"));
+    }
+
+    @Test
+    public void testRemoveAllowPatternsNullSkipped() {
+        decodeFilter.addAllowPatterns("com.example.");
+        decodeFilter.removeAllowPatterns((String) null);
+        assertTrue(decodeFilter.isAllowed("com.example.User"));
+    }
+
+    @Test
+    public void testRemoveAllowPatternsNonExistentNoCacheClear() {
+        decodeFilter.isAllowed("java.lang.String");
+        decodeFilter.removeAllowPatterns("nonexistent.");
+        assertTrue(decodeFilter.isAllowed("java.lang.String"));
+    }
+
+    @Test
+    public void testAddDenyPatterns() {
+        decodeFilter.addAllowPatterns("com.example.");
+        assertTrue(decodeFilter.isAllowed("com.example.User"));
+        decodeFilter.addDenyPatterns("com.example.User");
+        assertFalse(decodeFilter.isAllowed("com.example.User"));
+        assertTrue(decodeFilter.isAllowed("com.example.Other"));
+    }
+
+    @Test
+    public void testAddDenyPatternsPrefix() {
+        decodeFilter.addAllowPatterns("com.example.");
+        decodeFilter.addDenyPatterns("com.example.evil.");
+        assertFalse(decodeFilter.isAllowed("com.example.evil.Attack"));
+        assertTrue(decodeFilter.isAllowed("com.example.User"));
+    }
+
+    @Test
+    public void testAddDenyPatternsNullAndEmptySkipped() {
+        decodeFilter.addAllowPatterns("com.example.");
+        assertTrue(decodeFilter.isAllowed("com.example.User"));
+        decodeFilter.addDenyPatterns(null, "");
+        assertTrue(decodeFilter.isAllowed("com.example.User"));
+    }
+
+    @Test
+    public void testRemoveDenyPatterns() {
+        assertFalse(decodeFilter.isAllowed("java.lang.Runtime"));
+        decodeFilter.removeDenyPatterns("java.lang.Runtime");
+        decodeFilter.addAllowPatterns("java.lang.");
+        assertTrue(decodeFilter.isAllowed("java.lang.Runtime"));
+    }
+
+    @Test
+    public void testRemoveDenyPatternsPrefix() {
+        assertFalse(decodeFilter.isAllowed("java.rmi.server.UnicastRemoteObject"));
+        decodeFilter.removeDenyPatterns("java.rmi.");
+        decodeFilter.addAllowPatterns("java.rmi.");
+        assertTrue(decodeFilter.isAllowed("java.rmi.server.UnicastRemoteObject"));
+    }
+
+    @Test
+    public void testRemoveDenyPatternsNullSkipped() {
+        decodeFilter.removeDenyPatterns((String) null);
+        assertFalse(decodeFilter.isAllowed("java.lang.Runtime"));
+    }
+
+    @Test
+    public void testRemoveDenyPatternsNonExistentNoCacheClear() {
+        decodeFilter.isAllowed("java.lang.Runtime");
+        decodeFilter.removeDenyPatterns("nonexistent.");
+        assertFalse(decodeFilter.isAllowed("java.lang.Runtime"));
+    }
+
+    @Test
+    public void testClearDenyPatterns() {
+        assertFalse(decodeFilter.isAllowed("java.lang.Runtime"));
+        decodeFilter.clearDenyPatterns();
+        decodeFilter.addAllowPatterns("java.lang.");
+        assertTrue(decodeFilter.isAllowed("java.lang.Runtime"));
+    }
+
+    @Test
+    public void testClearCache() {
+        assertTrue(decodeFilter.isAllowed("java.lang.String"));
+        decodeFilter.clearAllowPatterns();
+        decodeFilter.addAllowPatterns("com.test.");
+        decodeFilter.clearCache();
+        assertFalse(decodeFilter.isAllowed("java.lang.String"));
+    }
+
+    @Test
+    public void testSetEnabledClearsCache() {
+        assertTrue(decodeFilter.isAllowed("java.lang.String"));
+        decodeFilter.clearAllowPatterns();
+        decodeFilter.addAllowPatterns("com.test.");
+        decodeFilter.setEnabled(true);
+        assertFalse(decodeFilter.isAllowed("java.lang.String"));
+    }
+
+    @Test
+    public void testAddAllowPatternsNullAndEmptySkipped() {
+        decodeFilter.addAllowPatterns(null, "", "com.example.");
+        assertTrue(decodeFilter.isAllowed("com.example.User"));
+    }
+
+    @Test
+    public void testJavaFilterAllowedClass() {
+        ObjectInputFilter.FilterInfo info = mockFilterInfo(java.lang.String.class);
+        assertEquals(ObjectInputFilter.Status.ALLOWED, DecodeFilter.javaFilter(info));
+    }
+
+    @Test
+    public void testJavaFilterBlockedClass() {
+        ObjectInputFilter.FilterInfo info = mockFilterInfo(java.lang.Runtime.class);
+        assertEquals(ObjectInputFilter.Status.REJECTED, DecodeFilter.javaFilter(info));
+    }
+
+    @Test
+    public void testJavaFilterNullSerialClass() {
+        ObjectInputFilter.FilterInfo info = mockFilterInfo(null);
+        assertEquals(ObjectInputFilter.Status.UNDECIDED, DecodeFilter.javaFilter(info));
+    }
+
+    @Test
+    public void testJavaFilterDisabled() {
+        decodeFilter.setEnabled(false);
+        ObjectInputFilter.FilterInfo info = mockFilterInfo(java.lang.Runtime.class);
+        assertEquals(ObjectInputFilter.Status.UNDECIDED, DecodeFilter.javaFilter(info));
+    }
+
+    private ObjectInputFilter.FilterInfo mockFilterInfo(Class<?> clazz) {
+        return new ObjectInputFilter.FilterInfo() {
+            @Override
+            public Class<?> serialClass() { return clazz; }
+            @Override
+            public long arrayLength() { return 0; }
+            @Override
+            public long depth() { return 0; }
+            @Override
+            public long references() { return 0; }
+            @Override
+            public long streamBytes() { return 0; }
+        };
     }
 }
