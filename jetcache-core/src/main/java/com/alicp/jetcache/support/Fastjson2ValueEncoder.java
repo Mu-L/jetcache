@@ -2,6 +2,7 @@ package com.alicp.jetcache.support;
 
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 
 /**
  * Created on 2022/07/26.
@@ -18,7 +19,7 @@ public class Fastjson2ValueEncoder extends AbstractJsonEncoder {
 
     @Override
     protected byte[] encodeSingleValue(Object value) {
-        return JSON.toJSONBytes(value);
+        return JSON.toJSONBytes(value, JSONWriter.Feature.WriteClassName);
     }
 
 }
