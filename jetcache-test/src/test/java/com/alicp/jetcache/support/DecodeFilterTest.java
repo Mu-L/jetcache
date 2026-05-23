@@ -351,6 +351,25 @@ public class DecodeFilterTest {
     }
 
     @Test
+    public void testAddDenyPatternsPackageOnly() {
+        decodeFilter.addAllowPatterns("com.example.");
+        // package-only deny: block only direct classes in "com.example.danger", not subpackages
+        decodeFilter.addDenyPatterns("com.example.danger");
+        assertFalse(decodeFilter.isAllowed("com.example.danger.Attack"));
+        assertTrue(decodeFilter.isAllowed("com.example.danger.sub.MoreAttack"));
+        assertTrue(decodeFilter.isAllowed("com.example.User"));
+    }
+
+    @Test
+    public void testAddDenyPatternsExactDoesNotMatchSimilar() {
+        decodeFilter.addAllowPatterns("com.example.");
+        decodeFilter.addDenyPatterns("com.example.Foo");
+        assertFalse(decodeFilter.isAllowed("com.example.Foo"));
+        assertTrue(decodeFilter.isAllowed("com.example.FooBar"));
+        assertTrue(decodeFilter.isAllowed("com.example.Foo$Inner"));
+    }
+
+    @Test
     public void testAddDenyPatternsNullAndEmptySkipped() {
         decodeFilter.addAllowPatterns("com.example.");
         assertTrue(decodeFilter.isAllowed("com.example.User"));

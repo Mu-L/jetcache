@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * A shared default instance is available via {@link #getDefault()}. Custom instances can be
  * created via the public constructor if needed (e.g. for per-context isolation).
  * <p>
- * Pattern syntax:
+ * Pattern syntax (applies to both allow and deny patterns):
  * <ul>
  *   <li>Prefix (ends with "."): matches all classes in the package and subpackages, e.g. "java.util." matches
  *       java.util.HashMap and java.util.concurrent.ConcurrentHashMap</li>
@@ -149,15 +149,11 @@ public class DecodeFilter {
         String nameToCheck = componentType.isEmpty() ? className : componentType;
 
         // Deny list has highest priority (allow patterns cannot bypass deny patterns)
-        // Deny supports both prefix (ends with ".") and exact class name (no trailing ".")
+        // Deny uses the same matching logic as allow: prefix, exact, and package-only.
         // WARNING: deny patterns can be removed via removeDenyPatterns/clearDenyPatterns,
         // which is a high-risk operation that weakens the security baseline
         for (String deny : denyPatterns) {
-            if (deny.endsWith(".")) {
-                if (nameToCheck.startsWith(deny)) {
-                    return false;
-                }
-            } else if (nameToCheck.equals(deny)) {
+            if (matches(deny, nameToCheck)) {
                 return false;
             }
         }
