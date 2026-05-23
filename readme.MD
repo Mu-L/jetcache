@@ -157,6 +157,8 @@ spring boot application.yml config:
 jetcache:
   statIntervalMinutes: 15
   areaInCacheName: false
+  decodeFilterAllowPatterns:
+    - com.yourcompany. #add your package here, or set decodeFilterEnabled: false to disable the filter
   local:
     default:
       type: linkedhashmap #other choose：caffeine
