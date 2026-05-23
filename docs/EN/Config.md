@@ -73,7 +73,9 @@ There are multi place which the write expire time can be set:
 
 ## Deserialization Filter Configuration
 
-JetCache 2.8.x enables deserialization filter by default. The default allow list:
+JetCache 2.8.x enables deserialization filter by default. The filter maintains both an **allow list** and a **deny list**. The deny list takes the highest priority and cannot be overridden by user-defined allow patterns.
+
+The default allow list:
 
 | Pattern | Match mode | Description |
 | --- | --- | --- |
@@ -98,7 +100,7 @@ jetcache:
     - org.myapp.dto.SecretDTO    # block one specific class
 ```
 
-**Filter rules**: The filter maintains both an allow list and a deny list. The deny list takes the highest priority and cannot be overridden by user-defined allow patterns.
+**Filter rules**: The built-in deny list includes known deserialization gadget chains (e.g. Commons Collections, Spring AOP, Hibernate, Groovy, JNDI/RMI, C3P0, etc.), dangerous classes like `java.lang.Runtime` and `ProcessBuilder`, and JDK internal packages like `com.sun.` and `sun.`. Deny patterns cannot be overridden by allow rules. If necessary, you can remove specific deny patterns via `DecodeFilter.getDefault().removeDenyPatterns(...)` (evaluate security risks yourself).
 
 **Pattern matching rules**:
 - **Prefix match** (ends with `.`): matches all classes in the package and all subpackages. For example, `com.example.` matches `com.example.Foo`, `com.example.sub.Bar`, etc.
@@ -117,6 +119,6 @@ filter.addAllowPatterns("com.example.");
 If a class is blocked during deserialization, an ERROR log is emitted (containing the rejected class name and configuration examples), and an exception is thrown. Kryo and JSON paths throw `DecodeFilterException`; Java serialization throws `InvalidClassException` (JDK internal behavior).
 
 **Notes**:
-- JDK dynamic proxy classes (e.g., `com.sun.proxy.$Proxy*`, `jdk.proxy*`) are not in the default allowed list. If you cache proxy objects (e.g., Spring AOP proxies), add the corresponding package to the filter.
-- The default allowed list does not include `java.io`, `java.rmi`, `java.beans`, `java.lang.reflect`, `javax.naming`, etc. If you need classes from these packages, add them via `decodeFilterAllowPatterns` or `addAllowPatterns`.
+- JDK dynamic proxy classes (e.g. `jdk.proxy1.$Proxy0`) are not in the default allow list. If you cache proxy objects (e.g. Spring AOP proxies), add an allow rule (e.g. `jdk.proxy.`).
+- Packages like `java.rmi.`, `javax.naming.`, `java.lang.reflect.`, `javax.script.`, `javax.management.` are in the built-in deny list — adding allow rules cannot override them. Packages like `java.io`, `java.beans` (except `EventHandler`) are not in the allow list but also not in the deny list; they can be added via `decodeFilterAllowPatterns` or `addAllowPatterns`.
 - If you need to block additional packages or classes beyond the built-in deny list, add them via `decodeFilterDenyPatterns` or `addDenyPatterns`.

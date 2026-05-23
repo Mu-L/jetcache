@@ -73,7 +73,9 @@ jetcache:
 
 ## 反序列化过滤器配置
 
-JetCache 2.8.x 默认开启反序列化过滤器，默认允许列表如下：
+JetCache 2.8.x 默认开启反序列化过滤器。过滤器同时维护**允许列表**和**拒绝列表**，拒绝列表优先级最高，即使用户添加了允许模式也无法绕过拒绝规则。
+
+默认允许列表如下：
 
 | 模式 | 匹配方式 | 说明 |
 | --- | --- | --- |
@@ -98,7 +100,7 @@ jetcache:
     - org.myapp.dto.SecretDTO    # 拒绝某一个具体类
 ```
 
-**过滤规则**：过滤器同时维护允许列表和拒绝列表，拒绝列表优先级最高，即使用户添加了允许模式也无法绕过。
+内置拒绝列表包含已知反序列化攻击 gadget chain（如 Commons Collections、Spring AOP、Hibernate、Groovy、JNDI/RMI、C3P0 等），以及 `java.lang.Runtime`、`ProcessBuilder` 等危险类和 `com.sun.`、`sun.` 等 JDK 内部包。拒绝列表不可被允许规则覆盖。如果确有需要，可通过 `DecodeFilter.getDefault().removeDenyPatterns(...)` 移除特定拒绝规则（需自行评估安全风险）。
 
 **模式匹配规则**：
 - **前缀匹配**（以`.`结尾）：匹配该包及其所有子包下的类。例如 `com.example.` 匹配 `com.example.Foo`、`com.example.sub.Bar` 等。
@@ -117,6 +119,6 @@ filter.addAllowPatterns("com.example.");
 如果反序列化时被拒绝，会输出ERROR日志（包含被拒绝的类名和配置示例），并抛出异常。Kryo和JSON路径抛出`DecodeFilterException`；Java序列化路径抛出`InvalidClassException`（JDK内部行为）。
 
 **注意**：
-- JDK动态代理类（如`com.sun.proxy.$Proxy*`、`jdk.proxy*`）不在默认允许列表中。如果缓存了代理对象（如Spring AOP代理），需要将对应包名添加到允许列表。
-- 默认允许列表不包含`java.io`、`java.rmi`、`java.beans`、`java.lang.reflect`、`javax.naming`等包。如果需要这些包中的类，可通过`decodeFilterAllowPatterns`或`addAllowPatterns`添加。
-- 如果需要在内置拒绝列表之外额外屏蔽包或类，可通过`decodeFilterDenyPatterns`或`addDenyPatterns`添加。
+- JDK 动态代理类（如 `jdk.proxy1.$Proxy0`）不在默认允许列表中。如果缓存了代理对象（如 Spring AOP 代理），需要添加允许规则（如 `jdk.proxy.`）。
+- `java.rmi.`、`javax.naming.`、`java.lang.reflect.`、`javax.script.`、`javax.management.` 等包在内置拒绝列表中，添加允许规则无法绕过。`java.io`、`java.beans`（除 `EventHandler` 外）等包不在允许列表中但也不在拒绝列表中，可通过 `decodeFilterAllowPatterns` 或 `addAllowPatterns` 添加。
+- 如果需要在内置拒绝列表之外额外屏蔽包或类，可通过 `decodeFilterDenyPatterns` 或 `addDenyPatterns` 添加。
