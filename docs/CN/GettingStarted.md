@@ -70,6 +70,15 @@ jetcache:
       host: 127.0.0.1
       port: 6379
 ```
+
+> **注意**：JetCache 2.8.x 默认开启了反序列化安全过滤器。上面的配置使用 `java` 序列化器，如果你的缓存值包含自定义类（如 `UserDO`、`OrderDO` 等），反序列化时会被过滤器拦截。你需要添加 `decodeFilterPatterns` 配置来允许你的类：
+> ```yaml
+> jetcache:
+>   decodeFilterPatterns:
+>     - com.company.mypackage.  # 允许该包下的所有类
+> ```
+> 详细配置说明请参见[配置文档](Config.md)中的"反序列化过滤器配置"章节。如果暂时不想配置，可以设置 `jetcache.decodeFilterEnabled: false` 关闭过滤器（**不建议在生产环境关闭**）。
+
 然后创建一个App类放在业务包的根下，EnableMethodCache，EnableCreateCacheAnnotation这两个注解分别激活Cached和CreateCache注解，其他和标准的Spring Boot程序是一样的。这个类可以直接main方法运行。
 ```java
 package com.company.mypackage;
@@ -173,6 +182,9 @@ public class JetCacheConfig {
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(15);
         globalCacheConfig.setAreaInCacheName(false); 
+
+        // 如果缓存值包含自定义类，需要配置反序列化过滤器允许列表
+        DecodeFilter.getDefault().addAllowPatterns("com.company.mypackage.");
 
         return globalCacheConfig;
     }

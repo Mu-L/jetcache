@@ -12,23 +12,22 @@ jetcache tested with below spring/spring-boot versions
 # compatible change notes
 ## 2.8.0
 * Java 17 is now the minimum required version
+* `areaInCacheName` default value is now `false` (was `true` in versions prior to 2.8.0).
+* kryo4 is no longer supported, `com.esotericsoftware:kryo` is upgraded to 5.x. The `KRYO` constant in `SerialPolicy` now uses kryo5 implementation internally. kryo4 serialized data is not compatible with kryo5, wait for old cache entries to expire or clear cache before upgrading
 * Removed fastjson1 support, `fastjson` key convertor now uses fastjson2 internally. If you need fastjson1, add the dependency yourself and implement a custom KeyConvertor
 * Removed Spring XML namespace support (`<jetcache:xxx>` tags in XML configuration are no longer available)
-* kryo4 is no longer supported, `com.esotericsoftware:kryo` is upgraded to 5.x. The `KRYO` constant in `SerialPolicy` now uses kryo5 implementation internally. kryo4 serialized data is not compatible with kryo5, wait for old cache entries to expire or clear cache before upgrading
-* Removed `IDENTITY_NUMBER_KRYO4` constant
-* `areaInCacheName` default value is now `false` (was `true` in versions prior to 2.8.0).
-* Added deserialization filter mechanism (enabled by default). This is a **breaking change** — if your cached values contain custom classes not in the default allowed list, deserialization will fail immediately after upgrading.
+* Added deserialization filter mechanism (enabled by default). This is a **breaking change** — if your cached values contain custom classes not in the default allowed list, deserialization (or serialization) will fail immediately after upgrading.
   
   **Upgrade steps**: Since older versions do not have this configuration option, pre-configuration before upgrading is not possible. Two recommended approaches:
   
-  Option 1 (recommended): Add `decodeFilterPatterns` configuration **at the same time** as upgrading JetCache, including the package names of your custom classes in the allow list. For example:
+  Option 1: Add `decodeFilterPatterns` configuration **at the same time** as upgrading JetCache, including the package names of your custom classes in the allow list. For example:
   ```yaml
   jetcache:
     decodeFilterPatterns:
       - com.yourcompany.
   ```
   
-  Option 2 (conservative): Disable the filter during upgrade, verify everything works, then gradually add allow list entries and re-enable (**not recommended for long-term use in production**):
+  Option 2: Disable the filter during upgrade (same behavior as 2.7):
   ```yaml
   jetcache:
     decodeFilterEnabled: false

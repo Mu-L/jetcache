@@ -93,6 +93,8 @@ Cache<Long, UserDO> userCache = RedisCacheBuilder.createRedisCacheBuilder()
                 .buildCache();
 ```
 
+> **安全提示**：JetCache 2.8.x 默认开启了反序列化安全过滤器，只允许常见Java包和JetCache包下的类被反序列化。如果缓存值包含自定义类（如 `UserDO`、`OrderDO`），需要配置允许列表，详见[配置文档](docs/CN/Config.md)中的"反序列化过滤器配置"章节。
+
 Cache接口支持异步：
 ```java
 CacheGetResult r = cache.GET(userId);

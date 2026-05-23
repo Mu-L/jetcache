@@ -61,46 +61,51 @@ The description of configuration listed in the below table:
 | jetcache.remote.${area}.broadcastChannel | n/a | jetcahe2.7 support invalidate local cache of other jvm after updatation (cacheType = CacheType.BOTH), this config specify broadcast channel, this feature disabled if not set                                                                                                                                                                        |
 | jetcache.local.${area}.expireAfterAccessInMillis | 0 | Global config of read expire time, in millis. Need jetcache2.2+, only local cache support this feature. 0 indicates disabled read expire feature.                                                                                                                                                                                                    |
 | jetcache.decodeFilterEnabled | true | Master switch for deserialization filter, enabled by default. Set to false to restore old behavior (NOT recommended) |
-| jetcache.decodeFilterPatterns | undefined | User-defined allowed package prefixes or full class names, appended to the default allowed list |
+| jetcache.decodeFilterPatterns | undefined | User-defined filter patterns appended to the default allowed list. Three match modes are supported (see below) |
 
 The ${area} of the above table is the ```area``` attribute of ```@Cached``` and ```@CreateCache```. Note that the default value of ```area``` attribute of the two annotation is ```"default"```.
 
+There are multi place which the write expire time can be set:
+1. if a method like ```put``` in ```Cache``` interface sets expire, then use it.
+1. if not set in method like ```put```, use default expire of the ```Cache``` instance
+1. the default expire of the ```Cache``` instance can be set in attribute on ```@CreateCache``` or ```@Cached```, if not, JetCache use global config ```defaultExpireInMillis``` defined in yml(for instance ```@Cached(cacheType=local)``` use ```jetcache.local.default.expireAfterWriteInMillis```), if there is not defined yet then use infinity.
+
 ## Deserialization Filter Configuration
 
-JetCache 2.8.x enables deserialization filter by default, only allowing classes under the following packages: `java.lang` (direct classes only, excluding subpackages like reflect/invoke), `java.util.`, `java.time.`, `java.math.`, `java.net` (direct classes only, excluding subpackages), `com.alicp.jetcache.`. If your cached values contain custom classes, you need to configure the filter:
+JetCache 2.8.x enables deserialization filter by default. The default allow list:
+
+| Pattern | Match mode | Description |
+| --- | --- | --- |
+| `java.lang` | Package match | Direct classes only (e.g. String, Integer), excluding subpackages (reflect, invoke) |
+| `java.util.` | Prefix match | Collections and subpackages (e.g. HashMap, concurrent.ConcurrentHashMap) |
+| `java.time.` | Prefix match | Date/time classes (e.g. LocalDate, Duration) |
+| `java.math.` | Prefix match | BigDecimal, BigInteger, etc. |
+| `java.net` | Package match | URI, URL, etc. Direct classes only, excluding subpackages |
+| `com.alicp.jetcache.` | Prefix match | JetCache internal classes |
+
+If your cached values contain custom classes, you need to configure the filter:
 
 ```yaml
 jetcache:
   decodeFilterEnabled: true  # default true, can set false to disable
   decodeFilterPatterns:
-    - com.example.          # prefix match: all classes under com.example
-    - org.myapp.dto.UserDTO # exact match: only this class
+    - com.example.          # prefix match: all classes under com.example and subpackages
+    - org.myapp.dto         # package match: direct classes in org.myapp.dto (no subpackages)
+    - org.myapp.dto.UserDTO # exact match: only this specific class
 ```
+
+**Pattern matching rules**:
+- **Prefix match** (ends with `.`): matches all classes in the package and all subpackages. For example, `com.example.` matches `com.example.Foo`, `com.example.sub.Bar`, etc.
+- **Package match** (no trailing `.`, not a full class name): matches only classes directly in the package, excluding subpackages. For example, `com.example` matches `com.example.Foo` but not `com.example.sub.Bar`. The default allow list uses this mode for `java.lang` and `java.net`.
+- **Exact match** (full class name): matches only one specific class. For example, `org.myapp.dto.UserDTO` matches only `org.myapp.dto.UserDTO`.
+
+> **Tip**: If your custom classes are spread across multiple packages, prefix match (ending with `.`) is the most convenient option.
 
 You can also configure programmatically (non-Spring Boot scenario):
 
 ```java
 DecodeFilter filter = DecodeFilter.getDefault();
-filter.setEnabled(true);
 filter.addAllowPatterns("com.example.");
-```
-
-`DecodeFilter` is non-singleton design with a default instance available via `getDefault()`. If isolation is needed (e.g., multiple contexts in the same JVM), you can create independent instances:
-
-```java
-DecodeFilter myFilter = new DecodeFilter(myAllowPatterns, myDenyPatterns);
-```
-
-The allow and deny patterns of the default instance can be managed via programmatic API:
-
-```java
-DecodeFilter filter = DecodeFilter.getDefault();
-filter.addAllowPatterns("com.example.", "org.myapp.");
-filter.removeAllowPatterns("org.myapp.");
-filter.clearAllowPatterns();
-filter.addDenyPatterns("com.dangerous.");
-filter.removeDenyPatterns("com.dangerous.");
-filter.clearDenyPatterns();
 ```
 
 If a class is blocked during deserialization, an ERROR log is emitted (containing the rejected class name and configuration examples), and an exception is thrown. Kryo and JSON paths throw `DecodeFilterException`; Java serialization throws `InvalidClassException` (JDK internal behavior).
@@ -108,9 +113,3 @@ If a class is blocked during deserialization, an ERROR log is emitted (containin
 **Notes**:
 - JDK dynamic proxy classes (e.g., `com.sun.proxy.$Proxy*`, `jdk.proxy*`) are not in the default allowed list. If you cache proxy objects (e.g., Spring AOP proxies), add the corresponding package to the filter.
 - The default allowed list does not include `java.io`, `java.rmi`, `java.beans`, `java.lang.reflect`, `javax.naming`, etc. If you need classes from these packages, add them via `decodeFilterPatterns` or `addAllowPatterns`.
-- The default deny list includes high-risk packages and classes (e.g., `java.rmi`, `javax.naming`, `com.sun.rowset`, `java.lang.Runtime`, etc.). The deny list can be modified via programmatic API.
-
-There are multi place which the write expire time can be set:
-1. if a method like ```put``` in ```Cache``` interface sets expire, then use it.
-1. if not set in method like ```put```, use default expire of the ```Cache``` instance
-1. the default expire of the ```Cache``` instance can be set in attribute on ```@CreateCache``` or ```@Cached```, if not, JetCache use global config ```defaultExpireInMillis``` defined in yml(for instance ```@Cached(cacheType=local)``` use ```jetcache.local.default.expireAfterWriteInMillis```), if there is not defined yet then use infinity.
