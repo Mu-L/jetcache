@@ -162,6 +162,9 @@ public class DecodeFilter {
 
     /**
      * Check if a class name is allowed for deserialization.
+     * <p>
+     * When this method returns {@code false}, an error log is automatically emitted
+     * with the specific block reason (e.g. matched deny pattern, no matching allow pattern).
      *
      * @param className the fully qualified class name (may include array type notation)
      * @return true if allowed, false if blocked
@@ -180,23 +183,24 @@ public class DecodeFilter {
             return cached;
         }
 
-        boolean allowed = checkAllowed(className);
+        String blockReason = checkBlockedReason(className);
+        if (blockReason != null) {
+            logBlocked(className, blockReason);
+            return false;
+        }
 
         // Only cache positive results to prevent unbounded growth from attack payloads
-        if (allowed) {
-            cache.put(className, true);
-        }
-
-        return allowed;
+        cache.put(className, true);
+        return true;
     }
 
-    private boolean checkAllowed(String className) {
+    private String checkBlockedReason(String className) {
         String componentType = extractComponentType(className);
         if (componentType == null) {
-            return true;
+            return null;
         }
         if (componentType.isEmpty() && className.startsWith("[")) {
-            return false;
+            return "invalid array type notation";
         }
 
         String nameToCheck = componentType.isEmpty() ? className : componentType;
@@ -207,17 +211,17 @@ public class DecodeFilter {
         // which is a high-risk operation that weakens the security baseline
         for (String deny : denyPatterns) {
             if (matches(deny, nameToCheck)) {
-                return false;
+                return "matched deny pattern: '" + deny + "'";
             }
         }
 
         for (String pattern : allowPatterns) {
             if (matches(pattern, nameToCheck)) {
-                return true;
+                return null;
             }
         }
 
-        return false;
+        return "no matching allow pattern found";
     }
 
     private String extractComponentType(String type) {
@@ -416,12 +420,12 @@ public class DecodeFilter {
         if (getDefault().isAllowed(className)) {
             return ObjectInputFilter.Status.ALLOWED;
         }
-        logBlocked(className);
         return ObjectInputFilter.Status.REJECTED;
     }
 
-    static void logBlocked(String className) {
+    private static void logBlocked(String className, String reason) {
         logger.error("Class '{}' is not allowed by the deserialization filter and has been blocked for security.\n" +
+                "\nReason: {}\n" +
                 "\nTo allow this class, add a pattern to your configuration:\n" +
                 "\nYAML:\n" +
                 "\n  jetcache:\n" +
@@ -433,7 +437,7 @@ public class DecodeFilter {
                 "Check your 'decodeFilterDenyPatterns' configuration if applicable.\n" +
                 "\nYou can also disable the filter (NOT RECOMMENDED):\n" +
                 "\n  jetcache.decodeFilterEnabled: false",
-                className);
+                className, reason);
     }
 
 }

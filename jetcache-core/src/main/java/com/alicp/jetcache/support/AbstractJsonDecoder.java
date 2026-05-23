@@ -74,7 +74,6 @@ public abstract class AbstractJsonDecoder extends AbstractValueDecoder {
             index += classNameLen;
 
             if (!DecodeFilter.getDefault().isAllowed(className)) {
-                DecodeFilter.logBlocked(className);
                 throw new DecodeFilterException(className);
             }
 

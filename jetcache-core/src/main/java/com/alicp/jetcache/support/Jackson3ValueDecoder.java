@@ -37,7 +37,6 @@ public class Jackson3ValueDecoder extends AbstractJsonDecoder {
         @Override
         public Validity validateSubClassName(DatabindContext ctxt, JavaType baseType, String subClassName) {
             if (!DecodeFilter.getDefault().isAllowed(subClassName)) {
-                DecodeFilter.logBlocked(subClassName);
                 throw new DecodeFilterException(subClassName);
             }
             return Validity.ALLOWED;
@@ -47,7 +46,6 @@ public class Jackson3ValueDecoder extends AbstractJsonDecoder {
         public Validity validateSubType(DatabindContext ctxt, JavaType baseType, JavaType subType) {
             String className = subType.getRawClass().getName();
             if (!DecodeFilter.getDefault().isAllowed(className)) {
-                DecodeFilter.logBlocked(className);
                 throw new DecodeFilterException(className);
             }
             return Validity.ALLOWED;

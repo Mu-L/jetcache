@@ -17,7 +17,6 @@ final class KryoClassResolverUtil {
             return;
         }
         if (decodeFilter.isEnabled() && !decodeFilter.isAllowed(className)) {
-            DecodeFilter.logBlocked(className);
             throw new DecodeFilterException(className);
         }
     }

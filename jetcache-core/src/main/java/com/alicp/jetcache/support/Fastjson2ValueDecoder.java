@@ -17,7 +17,6 @@ public class Fastjson2ValueDecoder extends AbstractJsonDecoder {
     private static final JSONReader.AutoTypeBeforeHandler AUTO_TYPE_HANDLER =
             (typeName, expectClass, features) -> {
                 if (!DecodeFilter.getDefault().isAllowed(typeName)) {
-                    DecodeFilter.logBlocked(typeName);
                     throw new DecodeFilterException(typeName);
                 }
                 return null;
