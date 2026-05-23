@@ -3,8 +3,6 @@
  */
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.anno.SerialPolicy;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -12,6 +10,27 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author huangli
  */
 public class DecoderMap {
+
+    public static final int IDENTITY_NUMBER_JAVA = 0x4A953A80;
+
+    // int IDENTITY_NUMBER_FASTJSON = 0x4A953A81; not used since 2.5+
+    // removed in 2.8.0
+    // int IDENTITY_NUMBER_KRYO4 = 0x4A953A82;
+
+    /**
+     * @since 2.7
+     */
+    public static final int IDENTITY_NUMBER_KRYO5 = 0xF6E0A5C0;
+
+    /**
+     * fastjson2 encoder/decoder is implemented but not register by default.
+     * This is because json is not good serializable util for java and has many compatible problems.
+     *
+     * @see com.alicp.jetcache.anno.support.DefaultEncoderParser
+     * @see DecoderMap
+     * @since 2.7
+     */
+    public static final int IDENTITY_NUMBER_FASTJSON2 = 0xF6E0A5C1;
 
     private final ConcurrentHashMap<Integer, AbstractValueDecoder> decoderMap = new ConcurrentHashMap<>();
     private volatile boolean inited = false;
@@ -55,13 +74,13 @@ public class DecoderMap {
             if (inited) {
                 return;
             }
-            register(SerialPolicy.IDENTITY_NUMBER_JAVA, defaultJavaValueDecoder());
+            register(IDENTITY_NUMBER_JAVA, defaultJavaValueDecoder());
             try {
                 Class.forName("com.esotericsoftware.kryo.kryo5.Kryo");
-                register(SerialPolicy.IDENTITY_NUMBER_KRYO5, Kryo5ValueDecoder.INSTANCE);
+                register(IDENTITY_NUMBER_KRYO5, Kryo5ValueDecoder.INSTANCE);
             } catch (ClassNotFoundException e) {
                 // the com.esotericsoftware:kryo should be 5+
-                register(SerialPolicy.IDENTITY_NUMBER_KRYO5, KryoValueDecoder.INSTANCE);
+                register(IDENTITY_NUMBER_KRYO5, KryoValueDecoder.INSTANCE);
             }
             // register(SerialPolicy.IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
             inited = true;

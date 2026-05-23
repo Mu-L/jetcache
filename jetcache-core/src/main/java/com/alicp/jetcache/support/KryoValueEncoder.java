@@ -1,6 +1,5 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.anno.SerialPolicy;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
@@ -73,7 +72,7 @@ public class KryoValueEncoder extends AbstractValueEncoder {
         try {
             kryoCache = pool.borrowObject();
             if (useIdentityNumber) {
-                writeInt(kryoCache.getOutput(), SerialPolicy.IDENTITY_NUMBER_KRYO5);
+                writeInt(kryoCache.getOutput(), DecoderMap.IDENTITY_NUMBER_KRYO5);
             }
             kryoCache.getKryo().writeClassAndObject(kryoCache.getOutput(), value);
             return kryoCache.getOutput().toBytes();
