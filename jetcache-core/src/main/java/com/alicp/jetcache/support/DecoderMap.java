@@ -90,7 +90,12 @@ public class DecoderMap {
                 register(IDENTITY_NUMBER_KRYO5, Kryo5ValueDecoder.INSTANCE);
             } catch (ClassNotFoundException e) {
                 // the com.esotericsoftware:kryo should be 5+
-                register(IDENTITY_NUMBER_KRYO5, KryoValueDecoder.INSTANCE);
+                try {
+                    Class.forName("com.esotericsoftware.kryo.Kryo");
+                    register(IDENTITY_NUMBER_KRYO5, KryoValueDecoder.INSTANCE);
+                } catch (ClassNotFoundException e2) {
+                    // kryo is not on the classpath, skip registration
+                }
             }
             // register(IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
             // register(IDENTITY_NUMBER_JACKSON3, Jackson3ValueDecoder.INSTANCE);
