@@ -31,6 +31,16 @@ public interface SerialPolicy {
      */
     String FASTJSON2 = "FASTJSON2";
 
+    /**
+     * jackson3 encoder/decoder is implemented but not register by default.
+     * This is because json is not good serializable util for java and has many compatible problems.
+     *
+     * @see com.alicp.jetcache.anno.support.DefaultEncoderParser
+     * @see com.alicp.jetcache.support.DecoderMap
+     * @since 2.8
+     */
+    String JACKSON3 = "JACKSON3";
+
     Function<Object, byte[]> encoder();
 
     Function<byte[], Object> decoder();

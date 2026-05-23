@@ -32,6 +32,16 @@ public class DecoderMap {
      */
     public static final int IDENTITY_NUMBER_FASTJSON2 = 0xF6E0A5C1;
 
+    /**
+     * jackson3 encoder/decoder is implemented but not register by default.
+     * This is because json is not good serializable util for java and has many compatible problems.
+     *
+     * @see com.alicp.jetcache.anno.support.DefaultEncoderParser
+     * @see DecoderMap
+     * @since 2.8
+     */
+    public static final int IDENTITY_NUMBER_JACKSON3 = 0xF6E0A5C2;
+
     private final ConcurrentHashMap<Integer, AbstractValueDecoder> decoderMap = new ConcurrentHashMap<>();
     private volatile boolean inited = false;
     private final ReentrantLock reentrantLock = new ReentrantLock();
@@ -82,7 +92,8 @@ public class DecoderMap {
                 // the com.esotericsoftware:kryo should be 5+
                 register(IDENTITY_NUMBER_KRYO5, KryoValueDecoder.INSTANCE);
             }
-            // register(SerialPolicy.IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
+            // register(IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
+            // register(IDENTITY_NUMBER_JACKSON3, Jackson3ValueDecoder.INSTANCE);
             inited = true;
         } finally {
             reentrantLock.unlock();
