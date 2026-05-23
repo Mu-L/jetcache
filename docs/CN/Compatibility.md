@@ -44,11 +44,14 @@ jetcache在以下spring/spring-boot版本下通过了测试，如果你只用部
 
 ## 2.7.0
 * jetcahe-redis依赖jedis4，如果你使用spring data并且使用jedis的话（spring-data默认用lettuce），它需要3，所以你需要自己把版本改回去，并且不能再使用jetcahe-redis了（改用jetcache-redis-springdata）
-* encoder/decoder支持kryo5，在yml中"kryo"对应`com.esotericsoftware:kryo`（5.x），"kryo5"对应`com.esotericsoftware.kryo:kryo5`。两者的序列化格式兼容，但maven坐标和Java包名不同，可以并存
+* encoder/decoder现在同时支持kryo4和kryo5，在yml中"kryo"仍然代表kryo4，"kryo5"代表kryo5。kryo4和kryo5的序列化内容完全不兼容。
+  * kryo4对应的依赖是com.esotericsoftware:kryo，kryo5对应的依赖是com.esotericsoftware.kryo:kryo5
+  * kryo4和kryo5可以并存，maven id和包名都不一样。
+  * 要注意com.esotericsoftware:kryo的版本号也可以改为5.x.x
 * lettuce连接redis cluster需要在yml里面指定mode=cluster
 * 默认的key convertor改成了"fastjson2"，fastjson2和fastjson可以并存，fastjson（非fastjson2）/kryo/kryo5/mvel在maven中都改为optional，如果使用了需要用户手工声明依赖
 * 如果没有使用spring boot，应该增加```@Import(JetCacheBaseBeans.class)```，同时删除原来定义的configProvider bean，具体例子可以看最新文档
-* GlobalCacheConfig.areaInCacheName默认值改为false（注意：由于bug，默认值实际仍为`true`，已在2.8.0修复）
+* GlobalCacheConfig.areaInCacheName默认值改为false(但是有bug，默认值可能还是true)，areaInCacheName=false这个还得加上
 
 ## 2.6.0
 * GET/GET_ALL方法不再触发自动刷新（大写的方法只简单访问缓存， 小写的方法才能触发这些附加功能）
