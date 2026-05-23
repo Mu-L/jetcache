@@ -80,7 +80,8 @@ public class JetCacheAutoConfiguration {
         _globalCacheConfig.setEnableMethodCache(props.isEnableMethodCache());
         _globalCacheConfig.setUseDefaultLocalExpireInMultiLevelCache(props.isUseDefaultLocalExpireInMultiLevelCache());
         _globalCacheConfig.setDecodeFilterEnabled(props.isDecodeFilterEnabled());
-        _globalCacheConfig.setDecodeFilterPatterns(props.getDecodeFilterPatterns());
+        _globalCacheConfig.setDecodeFilterAllowPatterns(props.getDecodeFilterAllowPatterns());
+        _globalCacheConfig.setDecodeFilterDenyPatterns(props.getDecodeFilterDenyPatterns());
         _globalCacheConfig.setLocalCacheBuilders(autoConfigureBeans.getLocalCacheBuilders());
         _globalCacheConfig.setRemoteCacheBuilders(autoConfigureBeans.getRemoteCacheBuilders());
         return _globalCacheConfig;

@@ -70,13 +70,13 @@ jetcache:
       port: 6379
 ```
 
-> **Note**: JetCache 2.8.x enables the deserialization security filter by default. The configuration above uses the `java` serializer. If your cached values contain custom classes (e.g. `UserDO`, `OrderDO`, etc.), deserialization will be blocked by the filter. You need to add `decodeFilterPatterns` to allow your classes:
+> **Note**: JetCache 2.8.x enables the deserialization security filter by default. The configuration above uses the `java` serializer. If your cached values contain custom classes (e.g. `UserDO`, `OrderDO`, etc.), deserialization will be blocked by the filter. You need to add `decodeFilterAllowPatterns` to allow your classes:
 > ```yaml
 > jetcache:
->   decodeFilterPatterns:
+>   decodeFilterAllowPatterns:
 >     - com.company.mypackage.  # allow all classes under this package
 > ```
-> See the "Deserialization Filter Configuration" section in the [configuration docs](Config.md) for details. You can set `jetcache.decodeFilterEnabled: false` to disable the filter temporarily (**NOT recommended in production**).
+> If you also need to block additional packages or classes, configure `decodeFilterDenyPatterns`. See the "Deserialization Filter Configuration" section in the [configuration docs](Config.md) for details. You can set `jetcache.decodeFilterEnabled: false` to disable the filter temporarily (**NOT recommended in production**).
 
 Then create the application class of Spring Boot:
 ```java

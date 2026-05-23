@@ -2,11 +2,16 @@ package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.autoconfigure.JetCacheProperties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,7 +55,8 @@ public class DecodeFilterConfigTest {
     public void testGlobalCacheConfigDefaults() {
         GlobalCacheConfig config = new GlobalCacheConfig();
         assertTrue(config.isDecodeFilterEnabled(), "decodeFilterEnabled should default to true");
-        assertNull(config.getDecodeFilterPatterns(), "decodeFilterPatterns should default to null");
+        assertNull(config.getDecodeFilterAllowPatterns(), "decodeFilterAllowPatterns should default to null");
+        assertNull(config.getDecodeFilterDenyPatterns(), "decodeFilterDenyPatterns should default to null");
     }
 
     @Test
@@ -59,8 +65,10 @@ public class DecodeFilterConfigTest {
         config.setDecodeFilterEnabled(false);
         assertFalse(config.isDecodeFilterEnabled());
 
-        config.setDecodeFilterPatterns(List.of("com.example."));
-        assertEquals(List.of("com.example."), config.getDecodeFilterPatterns());
+        config.setDecodeFilterAllowPatterns(List.of("com.example."));
+        config.setDecodeFilterDenyPatterns(List.of("com.example.blocked."));
+        assertEquals(List.of("com.example."), config.getDecodeFilterAllowPatterns());
+        assertEquals(List.of("com.example.blocked."), config.getDecodeFilterDenyPatterns());
     }
 
     @Test
@@ -69,13 +77,15 @@ public class DecodeFilterConfigTest {
         config.setLocalCacheBuilders(new HashMap<>());
         config.setRemoteCacheBuilders(new HashMap<>());
         config.setDecodeFilterEnabled(true);
-        config.setDecodeFilterPatterns(List.of("com.cfgprovider."));
+        config.setDecodeFilterAllowPatterns(List.of("com.cfgprovider."));
+        config.setDecodeFilterDenyPatterns(List.of("com.cfgprovider.blocked."));
 
         ConfigProvider provider = new ConfigProvider();
         provider.setGlobalCacheConfig(config);
         provider.init();
 
         assertTrue(decodeFilter.isAllowed("com.cfgprovider.MyClass"));
+        assertFalse(decodeFilter.isAllowed("com.cfgprovider.blocked.MyClass"));
         assertFalse(decodeFilter.isAllowed("com.other.MyClass"));
 
         provider.shutdown();
@@ -96,4 +106,19 @@ public class DecodeFilterConfigTest {
 
         provider.shutdown();
     }
+
+    @Test
+    public void testJetCachePropertiesBindAllowAndDenyPatterns() {
+        Map<String, String> source = new HashMap<>();
+        source.put("jetcache.decodeFilterAllowPatterns[0]", "com.allow.");
+        source.put("jetcache.decodeFilterDenyPatterns[0]", "com.allow.blocked.");
+
+        JetCacheProperties props = new Binder(new MapConfigurationPropertySource(source))
+                .bind("jetcache", Bindable.of(JetCacheProperties.class))
+                .orElseGet(JetCacheProperties::new);
+
+        assertEquals(List.of("com.allow."), props.getDecodeFilterAllowPatterns());
+        assertEquals(List.of("com.allow.blocked."), props.getDecodeFilterDenyPatterns());
+    }
+
 }

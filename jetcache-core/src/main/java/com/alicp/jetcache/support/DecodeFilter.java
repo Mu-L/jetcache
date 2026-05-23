@@ -425,10 +425,12 @@ public class DecodeFilter {
                 "\nTo allow this class, add a pattern to your configuration:\n" +
                 "\nYAML:\n" +
                 "\n  jetcache:\n" +
-                "    decodeFilterPatterns:\n" +
+                "    decodeFilterAllowPatterns:\n" +
                 "      - com.example.\n" +
                 "\nOr programmatically:\n" +
                 "\n  DecodeFilter.getDefault().addAllowPatterns(\"com.example.\");\n" +
+                "\nIf you have configured deny patterns, this class may also be blocked by them.\n" +
+                "Check your 'decodeFilterDenyPatterns' configuration if applicable.\n" +
                 "\nYou can also disable the filter (NOT RECOMMENDED):\n" +
                 "\n  jetcache.decodeFilterEnabled: false",
                 className);

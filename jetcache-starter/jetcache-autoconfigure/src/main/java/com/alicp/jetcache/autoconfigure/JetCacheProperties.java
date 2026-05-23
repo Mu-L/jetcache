@@ -19,7 +19,8 @@ public class JetCacheProperties {
     private boolean enableMethodCache = true;
     private boolean useDefaultLocalExpireInMultiLevelCache = false;
     private boolean decodeFilterEnabled = true;
-    private List<String> decodeFilterPatterns;
+    private List<String> decodeFilterAllowPatterns;
+    private List<String> decodeFilterDenyPatterns;
 
     public JetCacheProperties(){
     }
@@ -87,11 +88,20 @@ public class JetCacheProperties {
         this.decodeFilterEnabled = decodeFilterEnabled;
     }
 
-    public List<String> getDecodeFilterPatterns() {
-        return decodeFilterPatterns;
+    public List<String> getDecodeFilterAllowPatterns() {
+        return decodeFilterAllowPatterns;
     }
 
-    public void setDecodeFilterPatterns(List<String> decodeFilterPatterns) {
-        this.decodeFilterPatterns = decodeFilterPatterns;
+    public void setDecodeFilterAllowPatterns(List<String> decodeFilterAllowPatterns) {
+        this.decodeFilterAllowPatterns = decodeFilterAllowPatterns;
     }
+
+    public List<String> getDecodeFilterDenyPatterns() {
+        return decodeFilterDenyPatterns;
+    }
+
+    public void setDecodeFilterDenyPatterns(List<String> decodeFilterDenyPatterns) {
+        this.decodeFilterDenyPatterns = decodeFilterDenyPatterns;
+    }
+
 }

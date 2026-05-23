@@ -50,7 +50,7 @@ JetCache 2.8.x enables a deserialization security filter by default, which only 
 
 ```yaml
 jetcache:
-  decodeFilterPatterns:
+  decodeFilterAllowPatterns:
     - com.yourcompany.  # Prefix match: allows all classes under this package and its sub-packages
 ```
 

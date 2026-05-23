@@ -20,10 +20,10 @@ jetcache tested with below spring/spring-boot versions
   
   **Upgrade steps**: Since older versions do not have this configuration option, pre-configuration before upgrading is not possible. Two recommended approaches:
   
-  Option 1: Add `decodeFilterPatterns` configuration **at the same time** as upgrading JetCache, including the package names of your custom classes in the allow list. For example:
+  Option 1: Add `decodeFilterAllowPatterns` configuration **at the same time** as upgrading JetCache, including the package names of your custom classes in the allow list. For example:
   ```yaml
   jetcache:
-    decodeFilterPatterns:
+    decodeFilterAllowPatterns:
       - com.yourcompany.
   ```
   

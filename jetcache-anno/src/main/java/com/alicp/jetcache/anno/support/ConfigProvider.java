@@ -87,9 +87,13 @@ public class ConfigProvider extends AbstractLifecycle {
     private void initDecodeFilter() {
         DecodeFilter f = DecodeFilter.getDefault();
         f.setEnabled(globalCacheConfig.isDecodeFilterEnabled());
-        List<String> patterns = globalCacheConfig.getDecodeFilterPatterns();
-        if (patterns != null && !patterns.isEmpty()) {
-            f.addAllowPatterns(patterns.toArray(new String[0]));
+        List<String> allowPatterns = globalCacheConfig.getDecodeFilterAllowPatterns();
+        if (allowPatterns != null && !allowPatterns.isEmpty()) {
+            f.addAllowPatterns(allowPatterns.toArray(new String[0]));
+        }
+        List<String> denyPatterns = globalCacheConfig.getDecodeFilterDenyPatterns();
+        if (denyPatterns != null && !denyPatterns.isEmpty()) {
+            f.addDenyPatterns(denyPatterns.toArray(new String[0]));
         }
     }
 

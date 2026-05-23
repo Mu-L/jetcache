@@ -61,7 +61,8 @@ jetcache:
 | jetcache.remote.${area}.broadcastChannel | 无                           | jetcahe2.7的两级缓存支持更新以后失效其他JVM中的local cache，但多个服务共用redis同一个channel可能会造成广播风暴，需要在这里指定channel，你可以决定多个不同的服务是否共用同一个channel。如果没有指定则不开启。                                                                       |
 | jetcache.local.${area}.expireAfterAccessInMillis | 0                           | 需要jetcache2.2以上，以毫秒为单位，指定多长时间没有访问，就让缓存失效，当前只有本地缓存支持。0表示不使用这个功能。                                                                                                                                       |
 | jetcache.decodeFilterEnabled | true | 反序列化过滤器总开关，默认开启。关闭后恢复旧行为（不推荐关闭） |
-| jetcache.decodeFilterPatterns | 无 | 用户自定义的允许列表模式列表，追加到默认允许列表之后。支持三种匹配模式（见下方说明） |
+| jetcache.decodeFilterAllowPatterns | 无 | 用户自定义的允许列表模式，追加到默认允许列表之后。支持三种匹配模式（见下方说明） |
+| jetcache.decodeFilterDenyPatterns | 无 | 用户自定义的拒绝列表模式，追加到默认拒绝列表之后。拒绝列表始终优先于允许列表 |
 
 上表中${area}对应@Cached和@CreateCache的area属性。注意如果注解上没有指定area，默认值是"default"。
 
@@ -88,10 +89,13 @@ JetCache 2.8.x 默认开启反序列化过滤器，默认允许列表如下：
 ```yaml
 jetcache:
   decodeFilterEnabled: true  # 默认 true，可设 false 关闭
-  decodeFilterPatterns:
+  decodeFilterAllowPatterns:
     - com.example.          # 前缀匹配：com.example 包及其子包下所有类
     - org.myapp.dto         # 包名匹配：org.myapp.dto 包下的直接类（不含子包）
     - org.myapp.dto.UserDTO # 精确匹配：仅允许这一个类
+  decodeFilterDenyPatterns:
+    - com.example.internal.      # 拒绝该包及其子包下的类
+    - org.myapp.dto.SecretDTO    # 拒绝某一个具体类
 ```
 
 **过滤规则**：过滤器同时维护允许列表和拒绝列表，拒绝列表优先级最高，即使用户添加了允许模式也无法绕过。
@@ -114,4 +118,5 @@ filter.addAllowPatterns("com.example.");
 
 **注意**：
 - JDK动态代理类（如`com.sun.proxy.$Proxy*`、`jdk.proxy*`）不在默认允许列表中。如果缓存了代理对象（如Spring AOP代理），需要将对应包名添加到允许列表。
-- 默认允许列表不包含`java.io`、`java.rmi`、`java.beans`、`java.lang.reflect`、`javax.naming`等包。如果需要这些包中的类，可通过`decodeFilterPatterns`或`addAllowPatterns`添加。
+- 默认允许列表不包含`java.io`、`java.rmi`、`java.beans`、`java.lang.reflect`、`javax.naming`等包。如果需要这些包中的类，可通过`decodeFilterAllowPatterns`或`addAllowPatterns`添加。
+- 如果需要在内置拒绝列表之外额外屏蔽包或类，可通过`decodeFilterDenyPatterns`或`addDenyPatterns`添加。

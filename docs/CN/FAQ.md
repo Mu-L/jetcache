@@ -43,7 +43,7 @@ JetCache 2.8.x 默认开启了反序列化安全过滤器，只允许 `java.lang
 
 ```yaml
 jetcache:
-  decodeFilterPatterns:
+  decodeFilterAllowPatterns:
     - com.yourcompany.  # 前缀匹配：允许该包及其子包下所有类
 ```
 
@@ -64,4 +64,3 @@ json不是一个专门的java序列化库，更多的时候是用来和前端进
 
 因此fastjson2和jackson这两个json序列化器默认是没有注册的，如果要使用请自行做好相关的配置和改动。
 如果你不知道该怎么注册，建议不要用json序列化器，因为json反序列化出了问题你也搞不定的。
-

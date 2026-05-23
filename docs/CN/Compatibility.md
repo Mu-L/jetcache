@@ -20,10 +20,10 @@ jetcache在以下spring/spring-boot版本下通过了测试，如果你只用部
   
   **升级步骤**：由于旧版本没有此配置项，无法在升级前预配置。推荐以下两种方式：
   
-  方式一：升级JetCache的**同时**添加`decodeFilterPatterns`配置，将自定义类所在的包名加入白名单。例如：
+  方式一：升级JetCache的**同时**添加`decodeFilterAllowPatterns`配置，将自定义类所在的包名加入白名单。例如：
   ```yaml
   jetcache:
-    decodeFilterPatterns:
+    decodeFilterAllowPatterns:
       - com.yourcompany.
   ```
   

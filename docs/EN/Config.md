@@ -61,7 +61,8 @@ The description of configuration listed in the below table:
 | jetcache.remote.${area}.broadcastChannel | n/a | jetcahe2.7 support invalidate local cache of other jvm after updatation (cacheType = CacheType.BOTH), this config specify broadcast channel, this feature disabled if not set                                                                                                                                                                        |
 | jetcache.local.${area}.expireAfterAccessInMillis | 0 | Global config of read expire time, in millis. Need jetcache2.2+, only local cache support this feature. 0 indicates disabled read expire feature.                                                                                                                                                                                                    |
 | jetcache.decodeFilterEnabled | true | Master switch for deserialization filter, enabled by default. Set to false to restore old behavior (NOT recommended) |
-| jetcache.decodeFilterPatterns | undefined | User-defined filter patterns appended to the default allowed list. Three match modes are supported (see below) |
+| jetcache.decodeFilterAllowPatterns | undefined | User-defined allow patterns appended to the default allow list. Three match modes are supported (see below) |
+| jetcache.decodeFilterDenyPatterns | undefined | User-defined deny patterns appended to the default deny list. Deny patterns always take precedence over allow patterns |
 
 The ${area} of the above table is the ```area``` attribute of ```@Cached``` and ```@CreateCache```. Note that the default value of ```area``` attribute of the two annotation is ```"default"```.
 
@@ -88,10 +89,13 @@ If your cached values contain custom classes, you need to configure the filter:
 ```yaml
 jetcache:
   decodeFilterEnabled: true  # default true, can set false to disable
-  decodeFilterPatterns:
+  decodeFilterAllowPatterns:
     - com.example.          # prefix match: all classes under com.example and subpackages
     - org.myapp.dto         # package match: direct classes in org.myapp.dto (no subpackages)
     - org.myapp.dto.UserDTO # exact match: only this specific class
+  decodeFilterDenyPatterns:
+    - com.example.internal.      # block this package and its subpackages
+    - org.myapp.dto.SecretDTO    # block one specific class
 ```
 
 **Filter rules**: The filter maintains both an allow list and a deny list. The deny list takes the highest priority and cannot be overridden by user-defined allow patterns.
@@ -114,4 +118,5 @@ If a class is blocked during deserialization, an ERROR log is emitted (containin
 
 **Notes**:
 - JDK dynamic proxy classes (e.g., `com.sun.proxy.$Proxy*`, `jdk.proxy*`) are not in the default allowed list. If you cache proxy objects (e.g., Spring AOP proxies), add the corresponding package to the filter.
-- The default allowed list does not include `java.io`, `java.rmi`, `java.beans`, `java.lang.reflect`, `javax.naming`, etc. If you need classes from these packages, add them via `decodeFilterPatterns` or `addAllowPatterns`.
+- The default allowed list does not include `java.io`, `java.rmi`, `java.beans`, `java.lang.reflect`, `javax.naming`, etc. If you need classes from these packages, add them via `decodeFilterAllowPatterns` or `addAllowPatterns`.
+- If you need to block additional packages or classes beyond the built-in deny list, add them via `decodeFilterDenyPatterns` or `addDenyPatterns`.
